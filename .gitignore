@@ -1,0 +1,74 @@
+###############
+## .NET Build
+###############
+
+.vs/
+
+bin/
+obj/
+*/bin/
+*/obj/
+
+# Visual Studio files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Rider / VS Code
+.idea/
+.vscode/
+
+# Logs
+*.log
+
+# NuGet
+*.nupkg
+*.snupkg
+packages/
+.nuget/
+
+# Publish output
+publish/
+*.pubxml
+*.pubxml.user
+
+###########################
+## Sensitive Files ??
+###########################
+
+# Ignore ALL appsettings.* except appsettings.json (optional decision)
+*appsettings.Development.json
+*appsettings.Production.json
+*appsettings.Staging.json
+*appsettings.Local.json
+*appsettings.json
+*launchSettings.json
+secrets.json
+*.secret.json
+
+# Ignore environment local override files
+*.env
+*.env.*
+
+# Ignore JSON files containing API keys
+*apikey*.json
+*secrets*.json
+
+# Ignore certificates
+*.pfx
+*.p12
+*.pem
+*.key
+*.crt
+
+###########################
+## OS Specific
+###########################
+
+# Windows
+Thumbs.db
+desktop.ini
+
+# macOS
+.DS_Store

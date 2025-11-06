@@ -1,0 +1,54 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36518.9 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YoutubeCloneBackend.UserServices.API", "YoutubeCloneBackend.UserServices.API\YoutubeCloneBackend.UserServices.API.csproj", "{65C56F3B-5189-423D-BE79-2A413116FAD4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YoutubeCloneBackend.APIGateway", "YoutubeCloneBackend.APIGateway\YoutubeCloneBackend.APIGateway.csproj", "{18E22369-56D2-4307-85E2-AD0E659B9754}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YoutubeCloneBackend.Core", "YoutubeCloneBackend.Core\YoutubeCloneBackend.Core.csproj", "{5D8F5F6B-C023-4990-ACF0-9F224B9F18E1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YoutubeCloneBackend.Services", "YoutubeCloneBackend.Services\YoutubeCloneBackend.Services.csproj", "{920914B5-54D9-41C7-8302-EF161038ACDA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YoutubeCloneBackend.Persistence", "YoutubeCloneBackend.Persistence\YoutubeCloneBackend.Persistence.csproj", "{FF03CF40-F236-4821-AEC8-A79C99C3F230}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8EC462FD-D22E-90A8-E5CE-7E832BA40C5D}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{65C56F3B-5189-423D-BE79-2A413116FAD4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{65C56F3B-5189-423D-BE79-2A413116FAD4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{65C56F3B-5189-423D-BE79-2A413116FAD4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{65C56F3B-5189-423D-BE79-2A413116FAD4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{18E22369-56D2-4307-85E2-AD0E659B9754}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{18E22369-56D2-4307-85E2-AD0E659B9754}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{18E22369-56D2-4307-85E2-AD0E659B9754}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{18E22369-56D2-4307-85E2-AD0E659B9754}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5D8F5F6B-C023-4990-ACF0-9F224B9F18E1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5D8F5F6B-C023-4990-ACF0-9F224B9F18E1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5D8F5F6B-C023-4990-ACF0-9F224B9F18E1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5D8F5F6B-C023-4990-ACF0-9F224B9F18E1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{920914B5-54D9-41C7-8302-EF161038ACDA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{920914B5-54D9-41C7-8302-EF161038ACDA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{920914B5-54D9-41C7-8302-EF161038ACDA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{920914B5-54D9-41C7-8302-EF161038ACDA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FF03CF40-F236-4821-AEC8-A79C99C3F230}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FF03CF40-F236-4821-AEC8-A79C99C3F230}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FF03CF40-F236-4821-AEC8-A79C99C3F230}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FF03CF40-F236-4821-AEC8-A79C99C3F230}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7B33C69D-11F5-4C2B-8059-2A5744BC651E}
+	EndGlobalSection
+EndGlobal
