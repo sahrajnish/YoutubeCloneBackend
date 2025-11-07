@@ -1,4 +1,5 @@
 using YoutubeCloneBackend.Services.RegisterServices;
+using YoutubeCloneBackend.UserServices.API.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +12,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.RegisterDIServices();
 
 var app = builder.Build();
+app.UseMiddleware<ExceptionHandler>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
