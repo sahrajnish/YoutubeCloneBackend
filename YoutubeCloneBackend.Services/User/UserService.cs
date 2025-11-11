@@ -1,3 +1,4 @@
+using RabbitMQ.Client;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -5,19 +6,23 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using YoutubeCloneBackend.Core.User;
+using YoutubeCloneBackend.Messaging.Services;
 using YoutubeCloneBackend.Persistence.User;
+using YoutubeCloneBackend.Services.PublishEvents;
 
 namespace YoutubeCloneBackend.Services.User
 {
     public class UserService : IUserService
     {
         private readonly IUsers _user;
-        public UserService(IUsers user)
+        private readonly IPublishRegisteredUserEvent _publishEvent;
+        public UserService(IUsers user, IPublishRegisteredUserEvent publishEvent)
         {
             _user = user;
+            _publishEvent = publishEvent;
         }
 
-        public async Task<InsertUserToTempTableResponse> InsertUserService(string email)
+        public async Task<InsertUserToTempTableResponse> InsertUserToTempTableService(string email)
         {
             if (string.IsNullOrEmpty(email))
             {
@@ -36,6 +41,12 @@ namespace YoutubeCloneBackend.Services.User
             }
 
             var userInTempTable = await _user.InsertUserToTempTable(email);
+
+            if(userInTempTable != null)
+            {
+                await _publishEvent.PublishRegisteredUserEventService(email);
+            }
+
             return userInTempTable;
         }   
 

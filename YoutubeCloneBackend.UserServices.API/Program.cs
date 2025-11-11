@@ -1,3 +1,4 @@
+using YoutubeCloneBackend.Messaging.Services;
 using YoutubeCloneBackend.Services.RegisterServices;
 using YoutubeCloneBackend.UserServices.API.Middlewares;
 
@@ -10,6 +11,10 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.RegisterDIServices();
+
+var rabbitProvider = new RabbitMQConnectionProvider();
+await rabbitProvider.InitializeAsync();
+builder.Services.AddSingleton(rabbitProvider);
 
 var app = builder.Build();
 app.UseMiddleware<ExceptionHandler>();

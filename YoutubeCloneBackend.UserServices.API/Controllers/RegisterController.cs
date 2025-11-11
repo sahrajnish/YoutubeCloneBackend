@@ -26,7 +26,7 @@ namespace YoutubeCloneBackend.UserServices.API.Controllers
                 });
             }
 
-            var result = await _userService.InsertUserService(email);
+            var result = await _userService.InsertUserToTempTableService(email);
             return Ok(new
             {
                 Status = 200,

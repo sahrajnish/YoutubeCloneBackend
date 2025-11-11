@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\YoutubeCloneBackend.Core\YoutubeCloneBackend.Core.csproj" />
+    <ProjectReference Include="..\YoutubeCloneBackend.Messaging\YoutubeCloneBackend.Messaging.csproj" />
     <ProjectReference Include="..\YoutubeCloneBackend.Persistence\YoutubeCloneBackend.Persistence.csproj" />
   </ItemGroup>
 

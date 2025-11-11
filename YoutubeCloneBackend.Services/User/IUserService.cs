@@ -9,6 +9,6 @@ namespace YoutubeCloneBackend.Services.User
 {
     public interface IUserService
     {
-        Task<InsertUserToTempTableResponse> InsertUserService(string email);
+        Task<InsertUserToTempTableResponse> InsertUserToTempTableService(string email);
     }
 }
