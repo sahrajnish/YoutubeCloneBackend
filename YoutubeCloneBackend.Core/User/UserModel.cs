@@ -20,19 +20,31 @@ namespace YoutubeCloneBackend.Core.User
         public string AccountStatus { get; set; } = AccountStatusType.Pending.ToString();
     }
 
-    public class UserResponse
+    public class UserToTempTableResponse
     {
         public int Id { get; set; }
         public string Message { get; set; }
     }
 
+    public class GetUserResponse
+    {
+        public int Id { get; set; }
+        public string Email { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+    }
+
+    public class InsertUserToTempTableResponse
+    {
+        public int Id { get; set; }
+        public string Email { get; set; }
+        public DateTime EmailAddedAt { get; set; }
+        public DateTime EmailExpiresAt { get; set; }
+    }
+
     public class UserSchemaDTO
     {
         public required string Email { get; set; }
-        public string? Password { get; set; }
-        public string? FirstName { get; set; }
-        public string? LastName { get; set; }
-        public string? MobileNumber { get; set; }
     }
 
     public enum AccountStatusType

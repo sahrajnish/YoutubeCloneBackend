@@ -17,58 +17,26 @@ namespace YoutubeCloneBackend.Services.User
             _user = user;
         }
 
-        public async Task<UserResponse> InsertUserService(UserSchemaDTO user)
+        public async Task<InsertUserToTempTableResponse> InsertUserService(string email)
         {
-            if (user == null)
+            if (string.IsNullOrEmpty(email))
             {
-                throw new ArgumentNullException("User details are required");
+                throw new ArgumentNullException("Email is required");
             }
 
-            UserSchema userDetails = new UserSchema();
-
-            if (string.IsNullOrEmpty(user.Email))
+            if(!IsEmailValid(email))
             {
-                throw new ArgumentException("Email is required.");
-            }
-            else
-            {
-                if(!IsEmailValid(user.Email))
-                {
-                    throw new ArgumentException("Not a valid email");
-                }
-                userDetails.Email = user.Email.Trim().ToLower();
+                throw new ArgumentException("Enter a valid email address");
             }
 
-            if (!string.IsNullOrEmpty(user.Password))
+            var userInUserTable = await _user.GetUser(email);
+            if (userInUserTable != null)
             {
-                if(!IsPasswordValid(user.Password))
-                {
-                    throw new ArgumentException("Password must include minimum 8 characters, 1 upper, 1 lower, 1 number, 1 special");
-                }
-                userDetails.PasswordHash = HashPassword(user.Password);
+                throw new ArgumentException("User already exist. Please login to continue.");
             }
 
-            if (!string.IsNullOrEmpty(user.FirstName))
-            {
-                userDetails.FirstName = user.FirstName.Trim();
-            }
-
-            if (!string.IsNullOrEmpty(user.LastName))
-            {
-                userDetails.LastName = user.LastName.Trim();
-            }
-
-            if (!string.IsNullOrEmpty(user.MobileNumber))
-            {
-                if(!IsMobileValid(user.MobileNumber))
-                {
-                    throw new ArgumentException("Enter a valid Mobile Number");
-                }
-                userDetails.MobileNumber = user.MobileNumber.Trim();
-            }
-
-            var result = await _user.InsertUser(userDetails);
-            return result;
+            var userInTempTable = await _user.InsertUserToTempTable(email);
+            return userInTempTable;
         }   
 
         private string HashPassword(string PlainTextPassword)

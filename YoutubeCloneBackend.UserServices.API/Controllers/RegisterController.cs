@@ -15,9 +15,9 @@ namespace YoutubeCloneBackend.UserServices.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Register([FromBody] UserSchemaDTO user)
+        public async Task<IActionResult> Register(string email)
         {
-            if (user == null || string.IsNullOrEmpty(user.Email))
+            if (string.IsNullOrEmpty(email))
             {
                 return BadRequest(new
                 {
@@ -26,7 +26,7 @@ namespace YoutubeCloneBackend.UserServices.API.Controllers
                 });
             }
 
-            var result = await _userService.InsertUserService(user);
+            var result = await _userService.InsertUserService(email);
             return Ok(new
             {
                 Status = 200,

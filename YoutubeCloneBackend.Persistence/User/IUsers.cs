@@ -9,6 +9,7 @@ namespace YoutubeCloneBackend.Persistence.User
 {
     public interface IUsers
     {
-        Task<UserResponse> InsertUser(UserSchema user);
+        Task<GetUserResponse?> GetUser(string email);
+        Task<InsertUserToTempTableResponse> InsertUserToTempTable(string email);
     }
 }
