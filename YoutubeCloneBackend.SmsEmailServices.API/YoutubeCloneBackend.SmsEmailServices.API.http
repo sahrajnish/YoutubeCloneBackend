@@ -1,0 +1,6 @@
+@YoutubeCloneBackend.SmsEmailServices.API_HostAddress = http://localhost:5289
+
+GET {{YoutubeCloneBackend.SmsEmailServices.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
