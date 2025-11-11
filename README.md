@@ -5,6 +5,7 @@ A learning-focused backend for a YouTube-clone project implementing microservice
 ## Table of Contents
 
 - [Project Overview](#project-overview)
+- [Proposed Design](#proposed-design)
 - [Core Services](#core-services)
 - [Supporting Layers](#supporting-layers)
 - [Technology Stack](#technology-stack)
@@ -12,6 +13,9 @@ A learning-focused backend for a YouTube-clone project implementing microservice
 ## Project Overview
 
 This repository contains the backend codebase for a YouTube-clone application, designed for learning microservices, clean architecture, and .NET development. The project showcases separation of concerns, best practices, and is a work-in-progress for educational growth.
+
+## Proposed Design
+<img width="2638" height="1126" alt="Youtube SD 1" src="https://github.com/user-attachments/assets/880defde-f33b-4bdb-bcbf-258e6c36e04b" />
 
 ## Core Services
 
