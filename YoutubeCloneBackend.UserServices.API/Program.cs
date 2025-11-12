@@ -10,7 +10,7 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.RegisterDIServices();
+builder.Services.RegisterUserDIServices();
 
 var rabbitProvider = new RabbitMQConnectionProvider();
 await rabbitProvider.InitializeAsync();

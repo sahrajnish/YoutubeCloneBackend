@@ -11,9 +11,9 @@ using YoutubeCloneBackend.Services.User;
 
 namespace YoutubeCloneBackend.Services.RegisterServices
 {
-    public static class ApplicationServiceRegistry
+    public static class UserServiceRegistry
     {
-        public static void RegisterDIServices(this IServiceCollection services)
+        public static void RegisterUserDIServices(this IServiceCollection services)
         {
             services.AddScoped<IUsers, Users>();
             services.AddScoped<ISetting, Setting>();

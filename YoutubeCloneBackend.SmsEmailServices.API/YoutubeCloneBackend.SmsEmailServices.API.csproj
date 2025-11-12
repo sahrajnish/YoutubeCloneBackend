@@ -7,7 +7,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Mailjet.Api" Version="3.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\YoutubeCloneBackend.Core\YoutubeCloneBackend.Core.csproj" />
+    <ProjectReference Include="..\YoutubeCloneBackend.Messaging\YoutubeCloneBackend.Messaging.csproj" />
+    <ProjectReference Include="..\YoutubeCloneBackend.Services\YoutubeCloneBackend.Services.csproj" />
   </ItemGroup>
 
 </Project>
