@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using YoutubeCloneBackend.Messaging.Services;
 
@@ -32,7 +33,13 @@ namespace YoutubeCloneBackend.Services.PublishEvents
             var props = new BasicProperties();
             props.Persistent = true;
 
-            var body = Encoding.UTF8.GetBytes(email);
+            var messageObject = new
+            {
+                Email = email
+            };
+            var messageJson = JsonSerializer.Serialize(messageObject);
+
+            var body = Encoding.UTF8.GetBytes(messageJson);
 
             await channel.BasicPublishAsync(
                     exchange: "",
@@ -42,7 +49,7 @@ namespace YoutubeCloneBackend.Services.PublishEvents
                     body: body
                 );
 
-            Console.WriteLine($"Event published for email: {email}");
+            Console.WriteLine($"Message published for email: {messageJson}");
         }
     }
 }
