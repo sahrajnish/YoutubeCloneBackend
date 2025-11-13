@@ -24,7 +24,13 @@ namespace YoutubeCloneBackend.Persistence.RegisterOtp
             {
                 await connection.OpenAsync();
 
-                var cmdToInsertOtp = "SELECT otp_expires_at AS \"OtpExpiresAt\" FROM public.fn_add_otp_to_temp_users(@p_email, @p_otp)";
+                var cmdToInsertOtp = @"
+                    SELECT
+                        otp_expires_at AS ""OtpExpiresAt"",
+                        remaining_attempts AS ""RemainingAttempts"",
+                        reattempt_after AS ""ReattemptAfter""
+                    FROM public.fn_add_otp_to_temp_users(@p_email, @p_otp)";         
+                
                 var parameter = new
                 {
                     p_email = email,
@@ -34,9 +40,16 @@ namespace YoutubeCloneBackend.Persistence.RegisterOtp
                 var result = await connection.QueryFirstOrDefaultAsync<RegisterOtpResponseModel>(cmdToInsertOtp, parameter);
                 if(result != null)
                 {
-                    result.OtpExpiresAt = result.OtpExpiresAt.ToLocalTime();
+                    if(result.OtpExpiresAt.HasValue)
+                    {
+                        result.OtpExpiresAt = result.OtpExpiresAt.Value.ToLocalTime();
+                    }
+                    
+                    if(result.ReattemptAfter.HasValue)
+                    {
+                        result.ReattemptAfter = result.ReattemptAfter.Value.ToLocalTime();
+                    }
                 }
-
                 return result;
             }
         }

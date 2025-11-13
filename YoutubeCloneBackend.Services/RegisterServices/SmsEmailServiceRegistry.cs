@@ -10,6 +10,7 @@ using YoutubeCloneBackend.Core.Mailjet;
 using YoutubeCloneBackend.Persistence.RegisterOtp;
 using YoutubeCloneBackend.Persistence.Setting;
 using YoutubeCloneBackend.Services.ConsumeEvents.ConsumeRegistrationEvent;
+using YoutubeCloneBackend.Services.MailingService.MailingOtps;
 
 namespace YoutubeCloneBackend.Services.RegisterServices
 {
@@ -20,6 +21,7 @@ namespace YoutubeCloneBackend.Services.RegisterServices
             services.AddSingleton<IConsumeUserRegistrationEvent, ConsumeUserRegistrationEvent>();
             services.AddSingleton<ISetting, Setting>();
             services.AddSingleton<IRegisterOtps, RegisterOtps>();
+            services.AddSingleton<IMailOtp, MailOtp>();
         }
     }
 }

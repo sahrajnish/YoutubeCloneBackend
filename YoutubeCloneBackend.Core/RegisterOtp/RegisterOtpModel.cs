@@ -8,6 +8,8 @@ namespace YoutubeCloneBackend.Core.RegisterOtp
 {
     public class RegisterOtpResponseModel
     {
-        public DateTime OtpExpiresAt { get; set; }
+        public DateTime? OtpExpiresAt { get; set; }
+        public int RemainingAttempts { get; set; }
+        public DateTime? ReattemptAfter { get; set; }
     }
 }

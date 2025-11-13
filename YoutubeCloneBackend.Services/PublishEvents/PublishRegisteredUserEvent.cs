@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using YoutubeCloneBackend.Core.User;
 using YoutubeCloneBackend.Messaging.Services;
 
 namespace YoutubeCloneBackend.Services.PublishEvents
@@ -33,7 +34,7 @@ namespace YoutubeCloneBackend.Services.PublishEvents
             var props = new BasicProperties();
             props.Persistent = true;
 
-            var messageObject = new
+            var messageObject = new UserRegisteredEvent
             {
                 Email = email
             };

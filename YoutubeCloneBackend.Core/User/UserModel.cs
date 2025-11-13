@@ -47,6 +47,11 @@ namespace YoutubeCloneBackend.Core.User
         public required string Email { get; set; }
     }
 
+    public class UserRegisteredEvent
+    {
+        public string Email { get; set; }
+    }
+
     public enum AccountStatusType
     {
         Active,
