@@ -6,8 +6,8 @@ using System.Text;
 using System.Threading.Tasks;
 using YoutubeCloneBackend.Persistence.Setting;
 using YoutubeCloneBackend.Persistence.User;
-using YoutubeCloneBackend.Services.PublishEvents;
-using YoutubeCloneBackend.Services.User;
+using YoutubeCloneBackend.Services.UserServices.User;
+using YoutubeCloneBackend.Services.UserServices.UserToSmsEmail;
 
 namespace YoutubeCloneBackend.Services.RegisterServices
 {
@@ -18,7 +18,7 @@ namespace YoutubeCloneBackend.Services.RegisterServices
             services.AddScoped<IUsers, Users>();
             services.AddScoped<ISetting, Setting>();
             services.AddScoped<IUserService, UserService>();
-            services.AddScoped<IPublishRegisteredUserEvent, PublishRegisteredUserEvent>();
+            services.AddScoped<ISmsEmailClient, SmsEmailClient>();
         }
     }
 }

@@ -2,27 +2,29 @@ using RabbitMQ.Client;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using YoutubeCloneBackend.Core.RegisterOtp;
 using YoutubeCloneBackend.Core.User;
 using YoutubeCloneBackend.Messaging.Services;
 using YoutubeCloneBackend.Persistence.User;
-using YoutubeCloneBackend.Services.PublishEvents;
+using YoutubeCloneBackend.Services.UserServices.UserToSmsEmail;
 
-namespace YoutubeCloneBackend.Services.User
+namespace YoutubeCloneBackend.Services.UserServices.User
 {
     public class UserService : IUserService
     {
         private readonly IUsers _user;
-        private readonly IPublishRegisteredUserEvent _publishEvent;
-        public UserService(IUsers user, IPublishRegisteredUserEvent publishEvent)
+        private readonly ISmsEmailClient _smsEmailClient;
+        public UserService(IUsers user, ISmsEmailClient smsEmailClient)
         {
             _user = user;
-            _publishEvent = publishEvent;
+            _smsEmailClient = smsEmailClient;
         }
 
-        public async Task<InsertUserToTempTableResponse> InsertUserToTempTableService(string email)
+        public async Task<RegisterOtpResponseModel> InsertUserToTempTableService(string email)
         {
             if (string.IsNullOrEmpty(email))
             {
@@ -34,20 +36,28 @@ namespace YoutubeCloneBackend.Services.User
                 throw new ArgumentException("Enter a valid email address");
             }
 
+            // Check if user already exists in User Table.
             var userInUserTable = await _user.GetUser(email);
             if (userInUserTable != null)
             {
                 throw new ArgumentException("User already exist. Please login to continue.");
             }
 
+            // If User does not exist in user table then insert user to temp table
             var userInTempTable = await _user.InsertUserToTempTable(email);
-
-            if(userInTempTable != null)
+            if(userInTempTable == null)
             {
-                await _publishEvent.PublishRegisteredUserEventService(email);
+                throw new Exception("Something went wrong while creating temp user.");
             }
 
-            return userInTempTable;
+            // Call SmsEmilService API to generate OTP and send it to user's email.
+            var otpData = await _smsEmailClient.SendOtpAsync(email);
+            if(otpData == null)
+            {
+                throw new Exception("Failed to generate OTP. Please try again later.");
+            }
+
+            return otpData;
         }   
 
         private string HashPassword(string PlainTextPassword)

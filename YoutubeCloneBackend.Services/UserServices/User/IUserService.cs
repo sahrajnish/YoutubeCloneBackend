@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using YoutubeCloneBackend.Core.RegisterOtp;
 using YoutubeCloneBackend.Core.User;
 
-namespace YoutubeCloneBackend.Services.User
+namespace YoutubeCloneBackend.Services.UserServices.User
 {
     public interface IUserService
     {
-        Task<InsertUserToTempTableResponse> InsertUserToTempTableService(string email);
+        Task<RegisterOtpResponseModel> InsertUserToTempTableService(string email);
     }
 }

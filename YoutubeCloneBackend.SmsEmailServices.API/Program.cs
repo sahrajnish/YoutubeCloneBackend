@@ -1,6 +1,7 @@
 using YoutubeCloneBackend.Core.Mailjet;
 using YoutubeCloneBackend.Messaging.Services;
 using YoutubeCloneBackend.Services.RegisterServices;
+using YoutubeCloneBackend.SmsEmailServices.API.Middlewares;
 using YoutubeCloneBackend.SmsEmailServices.API.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -36,6 +37,7 @@ builder.Services.AddHostedService<RabbitMqBackgroundService>();
  */
 
 var app = builder.Build();
+app.UseMiddleware<ExceptionHandler>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -47,6 +49,22 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+// Allow only authorized services to access SmsEmailService. Services with APIKey in their headers will be allowed to access this microservice.
+app.Use(async (context, next) =>
+{
+    var config = context.RequestServices.GetRequiredService<IConfiguration>();
+    var expectedKey = config["InternalAuth:ApiKey"];
+
+    if(!context.Request.Headers.TryGetValue("X-Internal-Api-Key", out var providedKey) || providedKey !=  expectedKey)
+    {
+        context.Response.StatusCode = 401;
+        await context.Response.WriteAsync("Unauthorized internal request");
+        return; 
+    }
+
+    await next();
+});
 
 app.MapControllers();
 

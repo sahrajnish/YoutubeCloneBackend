@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using YoutubeCloneBackend.Core.Mailjet;
 
-namespace YoutubeCloneBackend.Services.MailingService.MailingOtps
+namespace YoutubeCloneBackend.Services.SmsEmailService.MailingService.MailingOtps
 {
     public class MailOtp : IMailOtp
     {
@@ -19,7 +19,7 @@ namespace YoutubeCloneBackend.Services.MailingService.MailingOtps
             _options = options.Value;
         }
 
-        public async Task<bool> SendRegisterOtp(string email, string otp, DateTime? otpExpiresAt)
+        public async Task<bool> SendRegisterOtp(string email, string otp)
         {
             var client = new MailjetClient(_options.ApiKey, _options.ApiSecret);
 

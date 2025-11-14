@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace YoutubeCloneBackend.Services.MailingService.MailingOtps
+namespace YoutubeCloneBackend.Services.SmsEmailService.MailingService.MailingOtps
 {
     public interface IMailOtp
     {
-        public Task<bool> SendRegisterOtp(string email, string otp, DateTime? otpExpiresAt);
+        public Task<bool> SendRegisterOtp(string email, string otp);
     }
 }

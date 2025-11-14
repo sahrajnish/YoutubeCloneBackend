@@ -12,6 +12,26 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.RegisterUserDIServices();
 
+// Connect to SmsEmailService with baseUrl in appsettings.json.
+// Also configure the client header to provide ApiKey from appsettings to get access of SmsEmailService, else request will be declined.
+builder.Services.AddHttpClient("SmsEmailService", client =>
+{
+    string baseUrl = builder.Configuration["SmsEmailService:BaseUrl"];
+    if(string.IsNullOrEmpty(baseUrl))
+    {
+        throw new Exception("SmsEmailService BaseUrl is missing in appsettings.json");
+    }
+    client.BaseAddress = new Uri(baseUrl);
+})
+.ConfigureHttpClient((sp, client) =>
+{
+    // Add ApiKey to header for getting access to SmsEmailService.
+    var config = sp.GetRequiredService<IConfiguration>();
+    var apiKey = config["InternalAuth:ApiKey"];
+
+    client.DefaultRequestHeaders.Add("X-Internal-Api-Key", apiKey);
+});
+
 var rabbitProvider = new RabbitMQConnectionProvider();
 await rabbitProvider.InitializeAsync();
 builder.Services.AddSingleton(rabbitProvider);

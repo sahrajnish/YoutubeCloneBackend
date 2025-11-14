@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace YoutubeCloneBackend.Services.ConsumeEvents.ConsumeRegistrationEvent
+namespace YoutubeCloneBackend.Services.SmsEmailService.ConsumeMailEvents
 {
-    public interface IConsumeUserRegistrationEvent
+    public interface IConsumeRegisterOtpMailEvent
     {
         public Task ConsumeEvents(CancellationToken cancellationToken);
     }

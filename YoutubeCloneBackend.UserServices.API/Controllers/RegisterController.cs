@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using YoutubeCloneBackend.Core.User;
-using YoutubeCloneBackend.Services.User;
+using YoutubeCloneBackend.Services.UserServices.User;
 
 namespace YoutubeCloneBackend.UserServices.API.Controllers
 {
@@ -26,21 +26,47 @@ namespace YoutubeCloneBackend.UserServices.API.Controllers
                 });
             }
 
-            var result = await _userService.InsertUserToTempTableService(email);
-            return Ok(new
-            {
-                Status = 200,
-                result
-            });
-        }
+            // Insert User to Temp Table and generate otp
+            var otpResult = await _userService.InsertUserToTempTableService(email);
 
-        [HttpGet("Temp")]
-        public IActionResult Temp()
-        {
+            if(otpResult == null)
+            {
+                return StatusCode(500, new
+                {
+                    Status = 500,
+                    Message = "OTP service is unavailable"
+                });
+            }
+
+            // Check for Cooldown period
+            if(otpResult.ReattemptAfter.HasValue)
+            {
+                return StatusCode(429, new
+                {
+                    Status = 429,
+                    Message = $"Too many attempts. Retry at {otpResult.ReattemptAfter}",
+                    ReattemptAt = otpResult.ReattemptAfter,
+                    RemainingAttempt = otpResult.RemainingAttempts
+                });
+            }
+
+            // Check if OTP was created successfully or not.
+            if(otpResult.OtpExpiresAt == null)
+            {
+                return StatusCode(500, new
+                {
+                    Status = 500,
+                    Message = "Failed to generate OTP. Please try again later."
+                });
+            }
+
             return Ok(new
             {
                 Status = 200,
-                Message = "Hello from User Services API"
+                Message = "OTP Sent",
+                OtpExpireyTime = otpResult.OtpExpiresAt,
+                ReattemptAt = otpResult.ReattemptAfter,
+                RemainingAttempt = otpResult.RemainingAttempts
             });
         }
     }

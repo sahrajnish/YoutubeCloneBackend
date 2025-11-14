@@ -12,4 +12,9 @@ namespace YoutubeCloneBackend.Core.RegisterOtp
         public int RemainingAttempts { get; set; }
         public DateTime? ReattemptAfter { get; set; }
     }
+
+    public class RegisterOtpRequestDto
+    {
+        public required string Email { get; set; }
+    }
 }

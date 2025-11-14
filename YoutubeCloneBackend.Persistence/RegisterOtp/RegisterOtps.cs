@@ -37,16 +37,19 @@ namespace YoutubeCloneBackend.Persistence.RegisterOtp
                     p_otp = otp
                 };
 
+                // Update the Postgres database with new otp and also update the necessary fields.
                 var result = await connection.QueryFirstOrDefaultAsync<RegisterOtpResponseModel>(cmdToInsertOtp, parameter);
                 if(result != null)
                 {
                     if(result.OtpExpiresAt.HasValue)
                     {
+                        // Convert the OTP Expiry time to Local time instead of GMT.
                         result.OtpExpiresAt = result.OtpExpiresAt.Value.ToLocalTime();
                     }
                     
                     if(result.ReattemptAfter.HasValue)
                     {
+                        // Convert the Reattempt time to Local time instead of GMT.
                         result.ReattemptAfter = result.ReattemptAfter.Value.ToLocalTime();
                     }
                 }
