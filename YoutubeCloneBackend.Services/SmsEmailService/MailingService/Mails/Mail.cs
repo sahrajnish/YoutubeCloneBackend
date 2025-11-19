@@ -27,8 +27,7 @@ namespace YoutubeCloneBackend.Services.SmsEmailService.MailingService.Mails
 
             var htmlbody = $@"
                 <div style='font-family:Arial;padding:20px'>
-                    <h2>Your OTP Code</h2>
-                    <p>Your verification OTP is:</p>
+                    <h2>Your OTP Code is: </h2>
                     <h1 style='color:#007bff;'>{otp}</h1>
                     <p>It will expire in 10 minutes.</p>
                 </div>

@@ -92,7 +92,7 @@ namespace YoutubeCloneBackend.Services.SmsEmailService.ConsumeMailEvents
 
             var consumer = new AsyncEventingBasicConsumer(channel);
 
-            // Consume the events from register_otp_async
+            // Consume the events from register_otp_queue
             consumer.ReceivedAsync += async (model, ea) =>
             {
                 try
@@ -108,7 +108,7 @@ namespace YoutubeCloneBackend.Services.SmsEmailService.ConsumeMailEvents
 
                     if (payload != null && !string.IsNullOrWhiteSpace(payload.Email))
                     {
-                        // Calls the IMailOtp in MailingService under SmsEmailService to send OTP to user's email.
+                        // Calls the IMail in MailingService under SmsEmailService to send OTP to user's email.
                         var isOtpSent = await _mail.SendRegisterOtp(payload.Email, payload.Otp);
 
                         if (!isOtpSent)

@@ -9,6 +9,6 @@ namespace YoutubeCloneBackend.Services.UserServices.OtpValidation
 {
     public interface IOtpValidations
     {
-        Task<VerifyOtpResponseModel?> VerifyRegisterOtpService(string Purpose, string Email, string Otp);
+        Task<VerifyOtpResponseModel?> VerifyOtpService(string Purpose, string Email, string Otp);
     }
 }

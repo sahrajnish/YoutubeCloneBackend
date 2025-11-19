@@ -38,6 +38,7 @@ namespace YoutubeCloneBackend.Persistence.ValidateOtps
                     p_otp = otp
                 };
 
+                // QuerySingleAsync will return only one row of data.
                 var result = await connection.QuerySingleAsync<VerifyOtpResponseModel>(cmdToValidateRegisterOtp, parameters);
                 if(result != null)
                 {

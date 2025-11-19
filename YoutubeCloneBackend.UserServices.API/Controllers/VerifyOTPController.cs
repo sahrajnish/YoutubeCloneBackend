@@ -27,7 +27,7 @@ namespace YoutubeCloneBackend.UserServices.API.Controllers
                 });
             }
 
-            var result = await _OtpValidations.VerifyRegisterOtpService(request.Purpose, request.Email, request.Otp);
+            var result = await _OtpValidations.VerifyOtpService(request.Purpose, request.Email, request.Otp);
             if(result == null)
             {
                 return StatusCode(500, new

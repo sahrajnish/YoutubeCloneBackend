@@ -19,7 +19,7 @@ namespace YoutubeCloneBackend.Services.UserServices.OtpValidation
             _mailEvent = mailEvent;
         }
 
-        public async Task<VerifyOtpResponseModel?> VerifyRegisterOtpService(string Purpose, string Email, string Otp)
+        public async Task<VerifyOtpResponseModel?> VerifyOtpService(string Purpose, string Email, string Otp)
         {
             if(string.IsNullOrEmpty(Purpose))
             {
@@ -36,6 +36,7 @@ namespace YoutubeCloneBackend.Services.UserServices.OtpValidation
                 throw new ArgumentNullException(nameof(Otp), "Please provide OTP to continue.");
             }
             
+            // If Purpose is "Register"
             if(Purpose.Equals("register", StringComparison.OrdinalIgnoreCase))
             {
                 var result = await _validateOtp.VerifyRegisterationOtp(Email, Otp);
@@ -48,6 +49,12 @@ namespace YoutubeCloneBackend.Services.UserServices.OtpValidation
                 await _mailEvent.SendWelcomeEmailToUser(Email);
 
                 return result;
+            }
+
+            // If Purpose is "Login"
+            if(Purpose.Equals("login", StringComparison.OrdinalIgnoreCase))
+            {
+
             }
 
             throw new Exception("Unsuported OTP Purpose.");
