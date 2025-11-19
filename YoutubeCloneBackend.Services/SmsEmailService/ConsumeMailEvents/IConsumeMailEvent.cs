@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 
 namespace YoutubeCloneBackend.Services.SmsEmailService.ConsumeMailEvents
 {
-    public interface IConsumeRegisterOtpMailEvent
+    public interface IConsumeMailEvent
     {
-        public Task ConsumeEvents(CancellationToken cancellationToken);
+        public Task ConsumeRegisterOtpEvents(CancellationToken cancellationToken);
+        public Task ConsumeNewUserEvents(CancellationToken cancellationToken);
     }
 }

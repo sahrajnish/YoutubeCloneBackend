@@ -6,6 +6,9 @@ using System.Text;
 using System.Threading.Tasks;
 using YoutubeCloneBackend.Persistence.Setting;
 using YoutubeCloneBackend.Persistence.User;
+using YoutubeCloneBackend.Persistence.ValidateOtps;
+using YoutubeCloneBackend.Services.UserServices.OtpValidation;
+using YoutubeCloneBackend.Services.UserServices.PublishMailEvents;
 using YoutubeCloneBackend.Services.UserServices.User;
 using YoutubeCloneBackend.Services.UserServices.UserToSmsEmail;
 
@@ -19,6 +22,9 @@ namespace YoutubeCloneBackend.Services.RegisterServices
             services.AddScoped<ISetting, Setting>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<ISmsEmailClient, SmsEmailClient>();
+            services.AddScoped<IValidateOtp, ValidateOtp>();
+            services.AddScoped<IOtpValidations, OtpValidations>();
+            services.AddScoped<IPublishMailEvent, PublishMailEvent>();
         }
     }
 }
