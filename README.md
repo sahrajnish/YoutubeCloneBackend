@@ -30,10 +30,12 @@ This repository contains the backend codebase for a YouTube-clone application, d
 
 ## Technology Stack
 
-| Component            | Details                            |
-|----------------------|------------------------------------|
-| Framework            | .NET 8.0                           |
-| Architecture         | Microservices, Clean Architecture  |
-| API Documentation    | Swagger (OpenAPI)                  |
-| Database             | PostgreSQL (SQL)                   |
-| ORM/Data Access      | Npgsql, Dapper  |
+| Component            | Details                                 |
+|----------------------|------------------------------------------|
+| Framework            | .NET 8.0                                 |
+| Architecture         | Microservices, Clean Architecture        |
+| API Documentation    | Swagger (OpenAPI)                        |
+| Database             | PostgreSQL (SQL)                         |
+| ORM/Data Access      | Npgsql, Dapper                           |
+| Message Broker       | RabbitMQ                                 |
+| Email Provider       | Mailjet                                  |
