@@ -18,13 +18,37 @@ namespace YoutubeCloneBackend.Persistence.User
             _connectionString = setting.ConnectionString;
         }
 
+        public async Task<CreatePasswordResponseModel?> CreateNewPassword(string email, string passwordHash)
+        {
+            using (var connection = new NpgsqlConnection(_connectionString))
+            {
+                await connection.OpenAsync();
+
+                const string cmdToCreatePassword = @"
+                    SELECT 
+                        is_success AS ""IsSuccess"",
+                        message AS ""Message""
+                    FROM user_srvc.fn_create_new_password(@p_email, @p_password_hash)";
+
+                var parameter = new
+                {
+                    p_email = email,
+                    p_password_hash = passwordHash
+                };
+
+                var result = await connection.QueryFirstOrDefaultAsync<CreatePasswordResponseModel>(cmdToCreatePassword, parameter);
+
+                    return result;
+            }
+        }
+
         public async Task<GetUserResponse?> GetUser(string email)
         {
             using (var connection = new NpgsqlConnection(_connectionString))
             {
                 await connection.OpenAsync();
 
-                const string cmdCheckUser = "SELECT * FROM public.fn_get_user_from_users_table(@p_email)";
+                const string cmdCheckUser = "SELECT * FROM user_srvc.fn_get_user_from_users_table(@p_email)";
 
                 var parameter = new
                 {
@@ -42,7 +66,7 @@ namespace YoutubeCloneBackend.Persistence.User
             {
                 await connection.OpenAsync();
 
-                const string cmdInsertUserToTempTable = "SELECT * FROM public.fn_insert_user_to_temp_users_table(@p_email)";
+                const string cmdInsertUserToTempTable = "SELECT * FROM auth.fn_insert_user_to_temp_users_table(@p_email)";
 
                 var parameter = new
                 {

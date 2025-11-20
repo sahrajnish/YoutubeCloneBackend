@@ -29,7 +29,7 @@ namespace YoutubeCloneBackend.Persistence.RegisterOtp
                         otp_expires_at AS ""OtpExpiresAt"",
                         remaining_attempts AS ""RemainingAttempts"",
                         reattempt_after AS ""ReattemptAfter""
-                    FROM public.fn_add_otp_to_temp_users(@p_email, @p_otp)";         
+                    FROM auth.fn_add_otp_to_temp_users(@p_email, @p_otp)";         
                 
                 var parameter = new
                 {

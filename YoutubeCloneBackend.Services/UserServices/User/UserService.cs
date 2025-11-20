@@ -58,7 +58,40 @@ namespace YoutubeCloneBackend.Services.UserServices.User
             }
 
             return otpData;
-        }   
+        }
+
+        public async Task<CreatePasswordResponseModel> CreateNewPasswordService(string email, string plainPassword, string confirmPassword)
+        {
+            if(string.IsNullOrWhiteSpace(email))
+            {
+                throw new ArgumentException("Email is required", nameof(email));
+            }
+
+            if(string.IsNullOrWhiteSpace(plainPassword))
+            {
+                throw new ArgumentException("Password is required", nameof(plainPassword));
+            }
+
+            if(plainPassword != confirmPassword)
+            {
+                throw new ArgumentException("Both Passwords do not match.");
+            }
+            
+            if(!IsPasswordValid(plainPassword)) 
+            {
+                throw new ArgumentException("Password must contain 8 characters including 1 uppercase, 1 lowercase, 1 digit, 1 special character");
+            }
+
+            var passwordHash = HashPassword(plainPassword);
+
+            var result = await _user.CreateNewPassword(email, passwordHash);
+            if(result == null)
+            {
+                throw new InvalidOperationException("Database did not return any result.");
+            }
+
+            return result;
+        }
 
         private string HashPassword(string PlainTextPassword)
         {

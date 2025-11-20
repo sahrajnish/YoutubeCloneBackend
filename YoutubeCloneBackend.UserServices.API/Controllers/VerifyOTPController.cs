@@ -5,7 +5,7 @@ using YoutubeCloneBackend.Services.UserServices.OtpValidation;
 namespace YoutubeCloneBackend.UserServices.API.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/User/[controller]")]
     public class VerifyOTPController : Controller
     {
         private readonly IOtpValidations _OtpValidations;

@@ -20,6 +20,7 @@ namespace YoutubeCloneBackend.Core.User
     public class VerifyOtpResponseModel
     {
         public string Message { get; set; }
+        public bool IsVerified { get; set; }
         public int? RemainingOtpAttempt { get; set; }
         public DateTime? OtpExpiresAt { get; set; }
         public DateTime? ReattemptAfter { get; set; }

@@ -46,7 +46,10 @@ namespace YoutubeCloneBackend.Services.UserServices.OtpValidation
                 }
 
                 // Publish Event to Send Welcome Email to User
-                await _mailEvent.SendWelcomeEmailToUser(Email);
+                if(result.IsVerified)
+                {
+                    await _mailEvent.SendWelcomeEmailToUser(Email);
+                }
 
                 return result;
             }

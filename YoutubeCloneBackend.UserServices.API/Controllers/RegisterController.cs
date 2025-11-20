@@ -5,7 +5,7 @@ using YoutubeCloneBackend.Services.UserServices.User;
 namespace YoutubeCloneBackend.UserServices.API.Controllers
 {
     [ApiController]
-    [Route("/api/[controller]")]
+    [Route("/api/User/[controller]")]
     public class RegisterController : Controller
     {
         private readonly IUserService _userService;

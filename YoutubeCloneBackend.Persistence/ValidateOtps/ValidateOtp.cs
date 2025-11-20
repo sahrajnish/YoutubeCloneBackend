@@ -27,10 +27,11 @@ namespace YoutubeCloneBackend.Persistence.ValidateOtps
                 var cmdToValidateRegisterOtp = @"
                     SELECT 
                         message AS ""Message"",
+                        is_verified AS ""IsVerified"",
                         remaining_otp_attempt AS ""RemainingOtpAttempt"",
                         otp_expiry_time AS ""OtpExpiresAt"",
                         reattempt_after AS ""ReattemptAfter""
-                    FROM public.fn_register_otp_validation(@p_email, @p_otp)";
+                    FROM auth.fn_register_otp_validation(@p_email, @p_otp)";
 
                 var parameters = new
                 {

@@ -28,7 +28,7 @@ namespace YoutubeCloneBackend.Core.User
 
     public class GetUserResponse
     {
-        public int Id { get; set; }
+        public int Guid { get; set; }
         public string Email { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
@@ -36,7 +36,7 @@ namespace YoutubeCloneBackend.Core.User
 
     public class InsertUserToTempTableResponse
     {
-        public int Id { get; set; }
+        public int Guid { get; set; }
         public string Email { get; set; }
         public DateTime EmailAddedAt { get; set; }
         public DateTime EmailExpiresAt { get; set; }
