@@ -18,7 +18,7 @@ namespace YoutubeCloneBackend.Persistence.ValidateOtps
             _connectionString = setting.ConnectionString;
         }
 
-        public async Task<VerifyOtpResponseModel?> VerifyRegisterationOtp(string email, string otp)
+        public async Task<VerifyRegisterOtpResponseModel?> VerifyRegisterationOtp(string email, string otp)
         {
             using (var connection = new NpgsqlConnection(_connectionString))
             {
@@ -40,7 +40,7 @@ namespace YoutubeCloneBackend.Persistence.ValidateOtps
                 };
 
                 // QuerySingleAsync will return only one row of data.
-                var result = await connection.QuerySingleAsync<VerifyOtpResponseModel>(cmdToValidateRegisterOtp, parameters);
+                var result = await connection.QuerySingleAsync<VerifyRegisterOtpResponseModel>(cmdToValidateRegisterOtp, parameters);
                 if(result != null)
                 {
                     if(result.OtpExpiresAt.HasValue)

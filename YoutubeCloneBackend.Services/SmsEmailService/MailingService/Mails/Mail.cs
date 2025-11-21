@@ -21,17 +21,31 @@ namespace YoutubeCloneBackend.Services.SmsEmailService.MailingService.Mails
             _options = options.Value;
         }
 
-        public async Task<bool> SendRegisterOtp(string email, string otp)
+        public async Task<bool> SendOtpEmail(string purpose, string email, string otp)
         {
             var client = new MailjetClient(_options.ApiKey, _options.ApiSecret);
 
+            string subject = purpose.ToLower() switch
+            {
+                "register" => "Your Registration OTP Code",
+                "reset" => "Your Password Reset OTP",
+                _ => "Your OTP Code"
+            };
+
+            string description = purpose.ToLower() switch
+            {
+                "register" => "Use this OTP to complete your registration.",
+                "reset" => "Use this OTP to reset your password.",
+                _ => "Use this OTP for verification."
+            };
+
             var htmlbody = $@"
-                <div style='font-family:Arial;padding:20px'>
-                    <h2>Your OTP Code is: </h2>
-                    <h1 style='color:#007bff;'>{otp}</h1>
-                    <p>It will expire in 10 minutes.</p>
-                </div>
-            ";
+                    <div style='font-family:Arial;padding:20px'>
+                        <h2>{subject}</h2>
+                        <h1 style='color:#007bff;'>{otp}</h1>
+                        <p>{description}</p>
+                        <p>This OTP expires in <strong>10 minutes</strong>.</p>
+                    </div>";
 
             var request = new MailjetRequest
             {
@@ -53,7 +67,7 @@ namespace YoutubeCloneBackend.Services.SmsEmailService.MailingService.Mails
                             {"Email", email }
                         }
                     } },
-                    {"Subject", "Your OTP Code" },
+                    {"Subject", subject },
                     {"HTMLPart", htmlbody }
                 }
             });

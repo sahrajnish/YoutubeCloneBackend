@@ -19,7 +19,7 @@ namespace YoutubeCloneBackend.Services.UserServices.OtpValidation
             _mailEvent = mailEvent;
         }
 
-        public async Task<VerifyOtpResponseModel?> VerifyOtpService(string Purpose, string Email, string Otp)
+        public async Task<VerifyRegisterOtpResponseModel?> VerifyOtpService(string Purpose, string Email, string Otp)
         {
             if(string.IsNullOrEmpty(Purpose))
             {

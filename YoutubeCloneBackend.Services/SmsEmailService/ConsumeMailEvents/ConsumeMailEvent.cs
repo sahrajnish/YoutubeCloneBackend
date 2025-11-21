@@ -78,12 +78,12 @@ namespace YoutubeCloneBackend.Services.SmsEmailService.ConsumeMailEvents
             await Task.Delay(Timeout.Infinite, cancellationToken);
         }
 
-        public async Task ConsumeRegisterOtpEvents(CancellationToken cancellationToken)
+        public async Task ConsumeOtpEvents(CancellationToken cancellationToken)
         {
-            using var channel = await _rabbitProvider.Connection.CreateChannelAsync();
+            var channel = await _rabbitProvider.Connection.CreateChannelAsync();
 
             await channel.QueueDeclareAsync(
-                    queue: "register_otp_queue",
+                    queue: "otp_events_queue",
                     durable: true,
                     exclusive: false,
                     autoDelete: false,
@@ -92,49 +92,43 @@ namespace YoutubeCloneBackend.Services.SmsEmailService.ConsumeMailEvents
 
             var consumer = new AsyncEventingBasicConsumer(channel);
 
-            // Consume the events from register_otp_queue
             consumer.ReceivedAsync += async (model, ea) =>
             {
                 try
                 {
                     var body = ea.Body.ToArray();
                     var message = Encoding.UTF8.GetString(body);
-                    // Console.WriteLine($"Received Message: {message}");
 
-                    var payload = JsonSerializer.Deserialize<UserRegisteredEvent>(
+                    var payload = JsonSerializer.Deserialize<OtpEvent>(
                         message,
                         new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
                     );
 
-                    if (payload != null && !string.IsNullOrWhiteSpace(payload.Email))
+                    if (payload == null || string.IsNullOrWhiteSpace(payload.Email))
                     {
-                        // Calls the IMail in MailingService under SmsEmailService to send OTP to user's email.
-                        var isOtpSent = await _mail.SendRegisterOtp(payload.Email, payload.Otp);
-
-                        if (!isOtpSent)
-                        {
-                            // Message sent failed. So Nack this and then requeue it.
-                            await channel.BasicNackAsync(ea.DeliveryTag, false, requeue: true);
-                            return;
-                        }
+                        await channel.BasicAckAsync(ea.DeliveryTag, multiple: false);
+                        return;
                     }
 
-                    // Ack here, means email sent successfully. Now delete from queue.
-                    // Here multipe: false means Donot Ack messeges upto the provided delivery tag.
-                    // if multiple: true 
-                    await channel.BasicAckAsync(ea.DeliveryTag, false);
-                } catch (Exception e)
-                {
-                    Console.WriteLine($"Error processing message: {e.Message}");
+                    bool isSent = await _mail.SendOtpEmail(payload.Purpose, payload.Email, payload.Otp);
 
+                    if (!isSent)
+                    {
+                        await channel.BasicNackAsync(ea.DeliveryTag, false, requeue: true);
+                        return;
+                    }
+
+                    await channel.BasicAckAsync(ea.DeliveryTag, false);
+                } 
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error processing message: {ex.Message}");
                     await channel.BasicNackAsync(ea.DeliveryTag, false, requeue: true);
                 }
             };
 
-            // Auto Acknowledge is set to false.
-            // Means RabbitMQ automatically doesnot mark true for each messages that it checks from queue.
             await channel.BasicConsumeAsync(
-                    queue: "register_otp_queue",
+                    queue: "otp_events_queue",
                     autoAck: false,
                     consumer: consumer
                 );

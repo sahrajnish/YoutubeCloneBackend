@@ -9,7 +9,9 @@ using System.Threading.Tasks;
 using YoutubeCloneBackend.Core.RegisterOtp;
 using YoutubeCloneBackend.Core.User;
 using YoutubeCloneBackend.Messaging.Services;
+using YoutubeCloneBackend.Persistence.SendOtps;
 using YoutubeCloneBackend.Persistence.User;
+using YoutubeCloneBackend.Services.UserServices.PublishMailEvents;
 using YoutubeCloneBackend.Services.UserServices.UserToSmsEmail;
 
 namespace YoutubeCloneBackend.Services.UserServices.User
@@ -18,10 +20,14 @@ namespace YoutubeCloneBackend.Services.UserServices.User
     {
         private readonly IUsers _user;
         private readonly ISmsEmailClient _smsEmailClient;
-        public UserService(IUsers user, ISmsEmailClient smsEmailClient)
+        private readonly ISendOtp _sendOtp;
+        private readonly IPublishMailEvent _publishEvent;
+        public UserService(IUsers user, ISmsEmailClient smsEmailClient, ISendOtp sendOtp, IPublishMailEvent publishEvent)
         {
             _user = user;
             _smsEmailClient = smsEmailClient;
+            _sendOtp = sendOtp;
+            _publishEvent = publishEvent;
         }
 
         public async Task<RegisterOtpResponseModel> InsertUserToTempTableService(string email)
@@ -76,6 +82,11 @@ namespace YoutubeCloneBackend.Services.UserServices.User
             {
                 throw new ArgumentException("Both Passwords do not match.");
             }
+
+            if(!IsEmailValid(email))
+            {
+                throw new ArgumentException("Invalid Email.", nameof(email));
+            }
             
             if(!IsPasswordValid(plainPassword)) 
             {
@@ -88,6 +99,34 @@ namespace YoutubeCloneBackend.Services.UserServices.User
             if(result == null)
             {
                 throw new InvalidOperationException("Database did not return any result.");
+            }
+
+            return result;
+        }
+
+        public async Task<SendResetOtpModel?> SendResetOtpService(string purpose, string email)
+        {
+            if (string.IsNullOrWhiteSpace(purpose))
+            {
+                throw new ArgumentException("Purpose is required", nameof (purpose));
+            }
+
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                throw new ArgumentException("Email is required", nameof(email));
+            }
+
+            if (!IsEmailValid(email))
+            {
+                throw new ArgumentException("Invalid Email.", nameof(email));
+            }
+
+            var otp = GenerateOtp();
+            var result = await _sendOtp.InsertResetOtpAsync(purpose.ToLower(), email, otp);
+
+            if(result != null && result.IsSuccess)
+            {
+                await _publishEvent.SendOtpToUser("reset", email, otp);
             }
 
             return result;
@@ -132,6 +171,12 @@ namespace YoutubeCloneBackend.Services.UserServices.User
             // Indian mobile: starts 6-9, 10 digits
             var regex = new Regex(@"^[6-9]\d{9}$");
             return regex.IsMatch(mobile.Trim());
+        }
+
+        private static string GenerateOtp()
+        {
+            var random = new Random();
+            return random.Next(100000, 999999).ToString();
         }
     }
 }

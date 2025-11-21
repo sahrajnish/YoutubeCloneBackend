@@ -8,6 +8,6 @@ namespace YoutubeCloneBackend.Services.SmsEmailService.PublishMailEvents
 {
     public interface IPublishRegisterOtpMailEvent
     {
-        public Task PublishEventToSendRegisterOtp(string email, string otp);
+        public Task PublishEventToSendOtp(string email, string otp);
     }
 }

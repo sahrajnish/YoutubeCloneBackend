@@ -8,7 +8,7 @@ namespace YoutubeCloneBackend.Services.SmsEmailService.MailingService.Mails
 {
     public interface IMail
     {
-        public Task<bool> SendRegisterOtp(string email, string otp);
+        public Task<bool> SendOtpEmail(string purpose, string email, string otp);
         public Task<bool> SendWelcomeEmail(string email);
     }
 }

@@ -9,5 +9,6 @@ namespace YoutubeCloneBackend.Services.UserServices.PublishMailEvents
     public interface IPublishMailEvent
     {
         public Task SendWelcomeEmailToUser(string email);
+        public Task SendOtpToUser(string purpose, string email, string otp);
     }
 }
