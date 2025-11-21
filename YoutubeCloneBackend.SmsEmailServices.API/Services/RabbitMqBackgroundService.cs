@@ -18,7 +18,7 @@ namespace YoutubeCloneBackend.SmsEmailServices.API.Services
             var tasks = new List<Task>
             {
                 Task.Run(() => _consumeMailEvent.ConsumeOtpEvents(stoppingToken), stoppingToken),
-                Task.Run(() => _consumeMailEvent.ConsumeNewUserEvents(stoppingToken), stoppingToken)
+                Task.Run(() => _consumeMailEvent.ConsumeNotifyEvents(stoppingToken), stoppingToken)
             };
             
 

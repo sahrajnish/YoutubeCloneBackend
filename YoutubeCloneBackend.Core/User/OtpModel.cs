@@ -20,8 +20,6 @@ namespace YoutubeCloneBackend.Core.User
     public class OtpDTOModel
     {
         [Required]
-        public string Purpose { get; set; }
-        [Required]
         public string Email { get; set; }
     }
 
@@ -50,13 +48,6 @@ namespace YoutubeCloneBackend.Core.User
         public DateTime? OtpExpiresAt { get; set; }
         public DateTime? OtpReattemptAt { get; set; }
         public int? RemainingOtpAttempts { get; set; }
-    }
-
-    public class OtpEvent
-    {
-        public string Purpose { get; set; }
-        public string Email { get; set; }
-        public string Otp {  get; set; }
     }
 
     public class NewUserEvent

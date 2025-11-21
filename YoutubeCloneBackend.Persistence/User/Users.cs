@@ -38,7 +38,7 @@ namespace YoutubeCloneBackend.Persistence.User
 
                 var result = await connection.QueryFirstOrDefaultAsync<CreatePasswordResponseModel>(cmdToCreatePassword, parameter);
 
-                    return result;
+                return result;
             }
         }
 

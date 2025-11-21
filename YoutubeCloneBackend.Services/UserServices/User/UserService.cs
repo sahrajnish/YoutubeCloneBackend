@@ -66,7 +66,7 @@ namespace YoutubeCloneBackend.Services.UserServices.User
             return otpData;
         }
 
-        public async Task<CreatePasswordResponseModel> CreateNewPasswordService(string email, string plainPassword, string confirmPassword)
+        public async Task<CreatePasswordResponseModel?> CreateNewPasswordService(string email, string plainPassword, string confirmPassword)
         {
             if(string.IsNullOrWhiteSpace(email))
             {
@@ -101,16 +101,22 @@ namespace YoutubeCloneBackend.Services.UserServices.User
                 throw new InvalidOperationException("Database did not return any result.");
             }
 
+            // Publish event to Notify User.
+            if(result != null && result.IsSuccess)
+            {
+                var eventDetails = new NotificationEvent
+                {
+                    Purpose = NotificationPurpose.PasswordCreated,
+                    Email = email,
+                };
+                await _publishEvent.NotifyUser(eventDetails);
+            }
+
             return result;
         }
 
-        public async Task<SendResetOtpModel?> SendResetOtpService(string purpose, string email)
+        public async Task<SendResetOtpModel?> SendResetOtpService(string email)
         {
-            if (string.IsNullOrWhiteSpace(purpose))
-            {
-                throw new ArgumentException("Purpose is required", nameof (purpose));
-            }
-
             if (string.IsNullOrWhiteSpace(email))
             {
                 throw new ArgumentException("Email is required", nameof(email));
@@ -122,11 +128,20 @@ namespace YoutubeCloneBackend.Services.UserServices.User
             }
 
             var otp = GenerateOtp();
-            var result = await _sendOtp.InsertResetOtpAsync(purpose.ToLower(), email, otp);
+
+            string purpose = OtpPurpose.ResetPassword.ToString().ToLower();
+
+            var result = await _sendOtp.InsertResetOtpAsync(purpose, email, otp);
 
             if(result != null && result.IsSuccess)
             {
-                await _publishEvent.SendOtpToUser("reset", email, otp);
+                var eventDetails = new OtpEvent
+                {
+                    Purpose = OtpPurpose.ResetPassword,
+                    Email = email,
+                    Otp = otp
+                };
+                await _publishEvent.SendOtpToUser(eventDetails);
             }
 
             return result;

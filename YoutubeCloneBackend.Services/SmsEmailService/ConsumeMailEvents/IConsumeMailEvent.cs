@@ -9,7 +9,7 @@ namespace YoutubeCloneBackend.Services.SmsEmailService.ConsumeMailEvents
     public interface IConsumeMailEvent
     {
         // Consume Event for Sending Welcome Email to new user
-        public Task ConsumeNewUserEvents(CancellationToken cancellationToken);
+        public Task ConsumeNotifyEvents(CancellationToken cancellationToken);
 
         // Consume Event to send OTP Based on Purpose - "register", "reset"
         public Task ConsumeOtpEvents(CancellationToken cancellationToken);

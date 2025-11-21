@@ -18,7 +18,7 @@ namespace YoutubeCloneBackend.Services.SmsEmailService.PublishMailEvents
             _rabbitProvider = connectionProvider;
         }
 
-        public async Task PublishEventToSendOtp(string email, string otp)
+        public async Task PublishEventToSendOtp(OtpEvent eventDetails)
         {
             using var channel = await _rabbitProvider.Connection.CreateChannelAsync();
 
@@ -33,14 +33,7 @@ namespace YoutubeCloneBackend.Services.SmsEmailService.PublishMailEvents
             var props = new BasicProperties();
             props.Persistent = true;    
 
-            var messageObject = new OtpEvent
-            {
-                Purpose = "register",
-                Email = email,
-                Otp = otp
-            };
-
-            var messageJson = JsonSerializer.Serialize(messageObject);
+            var messageJson = JsonSerializer.Serialize(eventDetails);
 
             var body = Encoding.UTF8.GetBytes(messageJson);
 

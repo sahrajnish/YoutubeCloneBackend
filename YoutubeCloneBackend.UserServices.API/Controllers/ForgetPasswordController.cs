@@ -27,7 +27,7 @@ namespace YoutubeCloneBackend.UserServices.API.Controllers
                 });
             }
 
-            var result = await _userService.SendResetOtpService(request.Purpose, request.Email);
+            var result = await _userService.SendResetOtpService(request.Email);
 
             return Ok(result);
         }

@@ -48,14 +48,19 @@ namespace YoutubeCloneBackend.Services.UserServices.OtpValidation
                 // Publish Event to Send Welcome Email to User
                 if(result.IsVerified)
                 {
-                    await _mailEvent.SendWelcomeEmailToUser(Email);
-                }
+                    var eventDetails = new NotificationEvent
+                    {
+                        Purpose = NotificationPurpose.WelcomeUser,
+                        Email = Email,
+                    };
+                    await _mailEvent.NotifyUser(eventDetails);
+                }   
 
                 return result;
             }
 
-            // If Purpose is "Login"
-            if(Purpose.Equals("login", StringComparison.OrdinalIgnoreCase))
+            // If Purpose is "ResetPassword"
+            if(Purpose.Equals("resetpassword", StringComparison.OrdinalIgnoreCase))
             {
 
             }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using YoutubeCloneBackend.Core.RegisterOtp;
+using YoutubeCloneBackend.Core.User;
 using YoutubeCloneBackend.Persistence.SendOtps;
 using YoutubeCloneBackend.Services.SmsEmailService.PublishMailEvents;
 
@@ -58,7 +59,17 @@ namespace YoutubeCloneBackend.Services.SmsEmailService.RegisterOtp
             // Publish event for sending OTP to user's email.
             // This will handle emailing OTP asynchronously.
             // Here Publishing Event is done by SmsEmailService and Consuming Event is also done by SmsEmailService to handle emailing Async.
-            await _mailEvent.PublishEventToSendOtp(email, otp);
+            if(res.OtpExpiresAt.HasValue)
+            {
+                var eventDetails = new OtpEvent
+                {
+                    Purpose = OtpPurpose.Register,
+                    Email = email,
+                    Otp = otp
+                };
+                await _mailEvent.PublishEventToSendOtp(eventDetails);
+            }
+            
 
             // Returns the OTP metadata in form of RegisterOtpResponseModel
             return res;

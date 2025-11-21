@@ -23,12 +23,12 @@ namespace YoutubeCloneBackend.Services.SmsEmailService.ConsumeMailEvents
             _mail = mail;
         }
 
-        public async Task ConsumeNewUserEvents(CancellationToken cancellationToken)
+        public async Task ConsumeNotifyEvents(CancellationToken cancellationToken)
         {
             using var channel = await _rabbitProvider.Connection.CreateChannelAsync();
 
             await channel.QueueDeclareAsync(
-                    queue: "new_users_queue",
+                    queue: "notification_queue",
                     durable: true,
                     exclusive: false,
                     autoDelete: false,
@@ -44,14 +44,14 @@ namespace YoutubeCloneBackend.Services.SmsEmailService.ConsumeMailEvents
                     var body = ea.Body.ToArray();
                     var message = Encoding.UTF8.GetString(body);
 
-                    var payload = JsonSerializer.Deserialize<NewUserEvent>(
+                    var payload = JsonSerializer.Deserialize<NotificationEvent>(
                         message,
                         new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
                     );
 
                     if(payload != null && !string.IsNullOrWhiteSpace(payload.Email))
                     {
-                        var isEmailSent = await _mail.SendWelcomeEmail(payload.Email);
+                        var isEmailSent = await _mail.SendNotificationEmail(payload.Purpose, payload.Email);
 
                         if(!isEmailSent)
                         {
@@ -70,7 +70,7 @@ namespace YoutubeCloneBackend.Services.SmsEmailService.ConsumeMailEvents
             };
 
             await channel.BasicConsumeAsync(
-                    queue: "new_users_queue",
+                    queue: "notification_queue",
                     autoAck: false,
                     consumer: consumer
                 );
@@ -104,7 +104,7 @@ namespace YoutubeCloneBackend.Services.SmsEmailService.ConsumeMailEvents
                         new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
                     );
 
-                    if (payload == null || string.IsNullOrWhiteSpace(payload.Email))
+                    if (payload == null || payload?.Purpose == null || string.IsNullOrWhiteSpace(payload.Email))
                     {
                         await channel.BasicAckAsync(ea.DeliveryTag, multiple: false);
                         return;

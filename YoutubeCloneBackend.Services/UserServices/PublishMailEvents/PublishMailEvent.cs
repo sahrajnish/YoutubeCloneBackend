@@ -18,7 +18,7 @@ namespace YoutubeCloneBackend.Services.UserServices.PublishMailEvents
             _rabbitProvider = rabbitProvider;
         }
 
-        public async Task SendOtpToUser(string purpose, string email, string otp)
+        public async Task SendOtpToUser(OtpEvent eventDetails)
         {
             using var channel = await _rabbitProvider.Connection.CreateChannelAsync();
 
@@ -33,14 +33,7 @@ namespace YoutubeCloneBackend.Services.UserServices.PublishMailEvents
             var props = new BasicProperties();
             props.Persistent = true;
 
-            var messageObject = new OtpEvent
-            {
-                Purpose = purpose,
-                Email = email,
-                Otp = otp,
-            };
-
-            var messageJson = JsonSerializer.Serialize(messageObject);
+            var messageJson = JsonSerializer.Serialize(eventDetails);
 
             var body = Encoding.UTF8.GetBytes(messageJson);
 
@@ -53,12 +46,12 @@ namespace YoutubeCloneBackend.Services.UserServices.PublishMailEvents
                 );
         }
 
-        public async Task SendWelcomeEmailToUser(string email)
+        public async Task NotifyUser(NotificationEvent eventDetails)
         {
             using var channel = await _rabbitProvider.Connection.CreateChannelAsync();
 
             await channel.QueueDeclareAsync(
-                    queue: "new_users_queue",
+                    queue: "notification_queue",
                     durable: true,
                     exclusive: false,
                     autoDelete: false,
@@ -68,18 +61,13 @@ namespace YoutubeCloneBackend.Services.UserServices.PublishMailEvents
             var props = new BasicProperties();
             props.Persistent = true;
 
-            var messageObject = new
-            {
-                Email = email
-            };
-
-            var messageJson = JsonSerializer.Serialize(messageObject);
+            var messageJson = JsonSerializer.Serialize(eventDetails);
 
             var body = Encoding.UTF8.GetBytes(messageJson);
 
             await channel.BasicPublishAsync(
                     exchange: "",
-                    routingKey: "new_users_queue",
+                    routingKey: "notification_queue",
                     mandatory: true,
                     basicProperties: props,
                     body: body

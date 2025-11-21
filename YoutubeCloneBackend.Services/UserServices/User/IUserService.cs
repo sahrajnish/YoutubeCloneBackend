@@ -11,7 +11,7 @@ namespace YoutubeCloneBackend.Services.UserServices.User
     public interface IUserService
     {
         Task<RegisterOtpResponseModel> InsertUserToTempTableService(string email);
-        Task<CreatePasswordResponseModel> CreateNewPasswordService(string email, string plainPassword, string confirmPassword);
-        Task<SendResetOtpModel?> SendResetOtpService(string purpose, string email);
+        Task<CreatePasswordResponseModel?> CreateNewPasswordService(string email, string plainPassword, string confirmPassword);
+        Task<SendResetOtpModel?> SendResetOtpService(string email);
     }
 }
