@@ -22,4 +22,11 @@ namespace YoutubeCloneBackend.Core.User
         public bool IsSuccess { get; set; }
         public string Message { get; set; }
     }
+
+    public enum NewPasswordTypes
+    {
+        NewPassword,
+        ResetPassword,
+        Unlock
+    }
 }
