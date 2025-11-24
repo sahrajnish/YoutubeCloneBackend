@@ -77,5 +77,29 @@ namespace YoutubeCloneBackend.Persistence.User
                 return result;
             }
         }
+
+        public async Task<CreatePasswordResponseModel?> ResetPassword(string purpose, string email, string passwordHash)
+        {
+            using (var connection = new NpgsqlConnection(_connectionString))
+            {
+                await connection.OpenAsync();
+
+                const string cmtToResetPassword = @"
+                    SELECT 
+                        is_success AS ""IsSuccess"",
+                        message AS ""Message"" 
+                    FROM user_srvc.fn_reset_password(@p_purpose, @p_email, @p_new_password_hash)";
+
+                var parameter = new
+                {
+                    p_purpose = purpose,
+                    p_email = email,
+                    p_new_password_hash = passwordHash
+                };
+
+                var result = await connection.QueryFirstOrDefaultAsync<CreatePasswordResponseModel>(cmtToResetPassword, parameter);
+                return result;
+            }
+        }
     }
 }

@@ -75,5 +75,31 @@ namespace YoutubeCloneBackend.UserServices.API.Controllers
                 data = result
             });
         }
+
+        [HttpPost("ResendOtp")]
+        public async Task<IActionResult> ResendOtp()
+        {
+            return Ok();
+        }
+
+        [HttpPost("CreatePassword")]
+        public async Task<IActionResult> Index([FromBody] CreatePasswordDTOModel request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new
+                {
+                    Status = 400,
+                    Message = "Invalid Input",
+                    Errors = ModelState
+                });
+            }
+
+            var purpose = NewPasswordTypes.NewPassword;
+
+            var result = await _userService.CreateNewPasswordService(purpose, request.Email, request.Password, request.ConfirmPassword);
+
+            return Ok(result);
+        }
     }
 }

@@ -66,7 +66,7 @@ namespace YoutubeCloneBackend.Services.UserServices.User
             return otpData;
         }
 
-        public async Task<CreatePasswordResponseModel?> CreateNewPasswordService(string email, string plainPassword, string confirmPassword)
+        public async Task<CreatePasswordResponseModel?> CreateNewPasswordService(NewPasswordTypes purpose, string email, string plainPassword, string confirmPassword)
         {
             if(string.IsNullOrWhiteSpace(email))
             {
@@ -95,24 +95,53 @@ namespace YoutubeCloneBackend.Services.UserServices.User
 
             var passwordHash = HashPassword(plainPassword);
 
-            var result = await _user.CreateNewPassword(email, passwordHash);
-            if(result == null)
+            // Purpose - Create first time password.
+            if(purpose == NewPasswordTypes.NewPassword)
             {
-                throw new InvalidOperationException("Database did not return any result.");
-            }
-
-            // Publish event to Notify User.
-            if(result != null && result.IsSuccess)
-            {
-                var eventDetails = new NotificationEvent
+                var result = await _user.CreateNewPassword(email, passwordHash);
+                if (result == null)
                 {
-                    Purpose = NotificationPurpose.PasswordCreated,
-                    Email = email,
-                };
-                await _publishEvent.NotifyUser(eventDetails);
+                    throw new InvalidOperationException("Database did not return any result.");
+                }
+
+                // Publish event to Notify User.
+                if (result != null && result.IsSuccess)
+                {
+                    var eventDetails = new NotificationEvent
+                    {
+                        Purpose = NotificationPurpose.PasswordCreated,
+                        Email = email,
+                    };
+                    await _publishEvent.NotifyUser(eventDetails);
+                }
+
+                return result;
             }
 
-            return result;
+            // Purpose - Reset password
+            if(purpose == NewPasswordTypes.ResetPassword)
+            {
+                string purposeToLower = NewPasswordTypes.ResetPassword.ToString().ToLower();
+                var result = await _user.ResetPassword(purposeToLower, email, passwordHash);
+                if(result == null)
+                {
+                    throw new Exception("Database did not return any result.");
+                }
+
+                if(result != null && result.IsSuccess)
+                {
+                    var eventDetails = new NotificationEvent
+                    {
+                        Purpose = NotificationPurpose.PasswordReset,
+                        Email = email,
+                    };
+                    await _publishEvent.NotifyUser(eventDetails);
+                }
+
+                return result;
+            }
+
+            throw new NotSupportedException($"Unhandled password action: {purpose}");
         }
 
         public async Task<SentOtpModel?> SendResetOtpService(string email)
