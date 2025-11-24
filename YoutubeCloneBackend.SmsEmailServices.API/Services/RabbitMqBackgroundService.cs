@@ -17,8 +17,8 @@ namespace YoutubeCloneBackend.SmsEmailServices.API.Services
             // Call ConsumeEvents method in IConsumeRegisterOtpMailEvent and provide stoppingToken in parameter.
             var tasks = new List<Task>
             {
-                Task.Run(() => _consumeMailEvent.ConsumeRegisterOtpEvents(stoppingToken), stoppingToken),
-                Task.Run(() => _consumeMailEvent.ConsumeNewUserEvents(stoppingToken), stoppingToken)
+                Task.Run(() => _consumeMailEvent.ConsumeOtpEvents(stoppingToken), stoppingToken),
+                Task.Run(() => _consumeMailEvent.ConsumeNotifyEvents(stoppingToken), stoppingToken)
             };
             
 

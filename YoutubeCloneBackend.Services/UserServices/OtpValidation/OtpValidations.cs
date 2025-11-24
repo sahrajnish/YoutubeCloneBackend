@@ -19,13 +19,8 @@ namespace YoutubeCloneBackend.Services.UserServices.OtpValidation
             _mailEvent = mailEvent;
         }
 
-        public async Task<VerifyOtpResponseModel?> VerifyOtpService(string Purpose, string Email, string Otp)
+        public async Task<OtpValidationModel?> VerifyOtpService(OtpPurpose Purpose, string Email, string Otp)
         {
-            if(string.IsNullOrEmpty(Purpose))
-            {
-                throw new ArgumentNullException(nameof(Purpose), "Purpose is required to Verify OTP");
-            }
-
             if(string.IsNullOrWhiteSpace(Email))
             {
                 throw new ArgumentNullException(nameof(Email), "Email is required to Verify OTP");
@@ -37,7 +32,7 @@ namespace YoutubeCloneBackend.Services.UserServices.OtpValidation
             }
             
             // If Purpose is "Register"
-            if(Purpose.Equals("register", StringComparison.OrdinalIgnoreCase))
+            if(Purpose == OtpPurpose.Register)
             {
                 var result = await _validateOtp.VerifyRegisterationOtp(Email, Otp);
                 if(result == null)
@@ -46,15 +41,27 @@ namespace YoutubeCloneBackend.Services.UserServices.OtpValidation
                 }
 
                 // Publish Event to Send Welcome Email to User
-                await _mailEvent.SendWelcomeEmailToUser(Email);
+                if(result.IsSuccess)
+                {
+                    var eventDetails = new NotificationEvent
+                    {
+                        Purpose = NotificationPurpose.WelcomeUser,
+                        Email = Email,
+                    };
+                    await _mailEvent.NotifyUser(eventDetails);
+                }   
 
                 return result;
             }
 
-            // If Purpose is "Login"
-            if(Purpose.Equals("login", StringComparison.OrdinalIgnoreCase))
+            // If Purpose is "ResetPassword"
+            if(Purpose == OtpPurpose.ResetPassword)
             {
+                string resetPurpose = ResetPurpose.ResetPassword.ToString().ToLower();
 
+                var result = await _validateOtp.VerifyResetPasswordOtp(resetPurpose, Email, Otp);
+
+                return result;
             }
 
             throw new Exception("Unsuported OTP Purpose.");

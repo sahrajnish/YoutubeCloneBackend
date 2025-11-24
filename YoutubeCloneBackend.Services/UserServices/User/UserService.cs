@@ -9,7 +9,9 @@ using System.Threading.Tasks;
 using YoutubeCloneBackend.Core.RegisterOtp;
 using YoutubeCloneBackend.Core.User;
 using YoutubeCloneBackend.Messaging.Services;
+using YoutubeCloneBackend.Persistence.SendOtps;
 using YoutubeCloneBackend.Persistence.User;
+using YoutubeCloneBackend.Services.UserServices.PublishMailEvents;
 using YoutubeCloneBackend.Services.UserServices.UserToSmsEmail;
 
 namespace YoutubeCloneBackend.Services.UserServices.User
@@ -18,13 +20,17 @@ namespace YoutubeCloneBackend.Services.UserServices.User
     {
         private readonly IUsers _user;
         private readonly ISmsEmailClient _smsEmailClient;
-        public UserService(IUsers user, ISmsEmailClient smsEmailClient)
+        private readonly ISendOtp _sendOtp;
+        private readonly IPublishMailEvent _publishEvent;
+        public UserService(IUsers user, ISmsEmailClient smsEmailClient, ISendOtp sendOtp, IPublishMailEvent publishEvent)
         {
             _user = user;
             _smsEmailClient = smsEmailClient;
+            _sendOtp = sendOtp;
+            _publishEvent = publishEvent;
         }
 
-        public async Task<RegisterOtpResponseModel> InsertUserToTempTableService(string email)
+        public async Task<SentOtpModel> InsertUserToTempTableService(string email)
         {
             if (string.IsNullOrEmpty(email))
             {
@@ -58,7 +64,88 @@ namespace YoutubeCloneBackend.Services.UserServices.User
             }
 
             return otpData;
-        }   
+        }
+
+        public async Task<CreatePasswordResponseModel?> CreateNewPasswordService(string email, string plainPassword, string confirmPassword)
+        {
+            if(string.IsNullOrWhiteSpace(email))
+            {
+                throw new ArgumentException("Email is required", nameof(email));
+            }
+
+            if(string.IsNullOrWhiteSpace(plainPassword))
+            {
+                throw new ArgumentException("Password is required", nameof(plainPassword));
+            }
+
+            if(plainPassword != confirmPassword)
+            {
+                throw new ArgumentException("Both Passwords do not match.");
+            }
+
+            if(!IsEmailValid(email))
+            {
+                throw new ArgumentException("Invalid Email.", nameof(email));
+            }
+            
+            if(!IsPasswordValid(plainPassword)) 
+            {
+                throw new ArgumentException("Password must contain 8 characters including 1 uppercase, 1 lowercase, 1 digit, 1 special character");
+            }
+
+            var passwordHash = HashPassword(plainPassword);
+
+            var result = await _user.CreateNewPassword(email, passwordHash);
+            if(result == null)
+            {
+                throw new InvalidOperationException("Database did not return any result.");
+            }
+
+            // Publish event to Notify User.
+            if(result != null && result.IsSuccess)
+            {
+                var eventDetails = new NotificationEvent
+                {
+                    Purpose = NotificationPurpose.PasswordCreated,
+                    Email = email,
+                };
+                await _publishEvent.NotifyUser(eventDetails);
+            }
+
+            return result;
+        }
+
+        public async Task<SentOtpModel?> SendResetOtpService(string email)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                throw new ArgumentException("Email is required", nameof(email));
+            }
+
+            if (!IsEmailValid(email))
+            {
+                throw new ArgumentException("Invalid Email.", nameof(email));
+            }
+
+            var otp = GenerateOtp();
+
+            string purpose = OtpPurpose.ResetPassword.ToString().ToLower();
+
+            var result = await _sendOtp.InsertResetOtpAsync(purpose, email, otp);
+
+            if(result != null && result.IsSuccess)
+            {
+                var eventDetails = new OtpEvent
+                {
+                    Purpose = OtpPurpose.ResetPassword,
+                    Email = email,
+                    Otp = otp
+                };
+                await _publishEvent.SendOtpToUser(eventDetails);
+            }
+
+            return result;
+        }
 
         private string HashPassword(string PlainTextPassword)
         {
@@ -99,6 +186,12 @@ namespace YoutubeCloneBackend.Services.UserServices.User
             // Indian mobile: starts 6-9, 10 digits
             var regex = new Regex(@"^[6-9]\d{9}$");
             return regex.IsMatch(mobile.Trim());
+        }
+
+        private static string GenerateOtp()
+        {
+            var random = new Random();
+            return random.Next(100000, 999999).ToString();
         }
     }
 }

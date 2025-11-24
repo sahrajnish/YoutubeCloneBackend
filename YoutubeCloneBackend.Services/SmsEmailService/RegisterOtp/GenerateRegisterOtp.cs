@@ -4,22 +4,23 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using YoutubeCloneBackend.Core.RegisterOtp;
-using YoutubeCloneBackend.Persistence.RegisterOtp;
+using YoutubeCloneBackend.Core.User;
+using YoutubeCloneBackend.Persistence.SendOtps;
 using YoutubeCloneBackend.Services.SmsEmailService.PublishMailEvents;
 
 namespace YoutubeCloneBackend.Services.SmsEmailService.RegisterOtp
 {
     public class GenerateRegisterOtp : IGenerateRegisterOtp
     {
-        private readonly IRegisterOtps _registerOtp;
+        private readonly ISendOtp _registerOtp;
         private readonly IPublishRegisterOtpMailEvent _mailEvent;
-        public GenerateRegisterOtp(IRegisterOtps registerOtp, IPublishRegisterOtpMailEvent mailEvent)
+        public GenerateRegisterOtp(ISendOtp registerOtp, IPublishRegisterOtpMailEvent mailEvent)
         {
             _registerOtp = registerOtp;
             _mailEvent = mailEvent;
         }
 
-        public async Task<RegisterOtpResponseModel> GenerateOtp(string email)
+        public async Task<SentOtpModel> GenerateOtp(string email)
         {
             if(string.IsNullOrEmpty(email))
             {
@@ -38,19 +39,8 @@ namespace YoutubeCloneBackend.Services.SmsEmailService.RegisterOtp
                 throw new Exception("Something went wrong while registering OTP");
             }
 
-            // if user on cooldown period
-            if(res.ReattemptAfter.HasValue)
-            {
-                return new RegisterOtpResponseModel
-                {
-                    OtpExpiresAt = null,
-                    RemainingAttempts = res.RemainingAttempts,
-                    ReattemptAfter = res.ReattemptAfter
-                };
-            }
-
             // Otp generation failed
-            if(res.OtpExpiresAt == null)
+            if(res == null)
             {
                 throw new Exception("DB did not return OTP expiry — OTP not generated");
             }
@@ -58,7 +48,16 @@ namespace YoutubeCloneBackend.Services.SmsEmailService.RegisterOtp
             // Publish event for sending OTP to user's email.
             // This will handle emailing OTP asynchronously.
             // Here Publishing Event is done by SmsEmailService and Consuming Event is also done by SmsEmailService to handle emailing Async.
-            await _mailEvent.PublishEventToSendRegisterOtp(email, otp);
+            if(res.IsSuccess)
+            {
+                var eventDetails = new OtpEvent
+                {
+                    Purpose = OtpPurpose.Register,
+                    Email = email,
+                    Otp = otp
+                };
+                await _mailEvent.PublishEventToSendOtp(eventDetails);
+            }
 
             // Returns the OTP metadata in form of RegisterOtpResponseModel
             return res;

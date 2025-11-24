@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using YoutubeCloneBackend.Core.Mailjet;
-using YoutubeCloneBackend.Persistence.RegisterOtp;
+using YoutubeCloneBackend.Persistence.SendOtps;
 using YoutubeCloneBackend.Persistence.Setting;
 using YoutubeCloneBackend.Services.SmsEmailService.ConsumeMailEvents;
 using YoutubeCloneBackend.Services.SmsEmailService.MailingService.Mails;
@@ -22,7 +22,7 @@ namespace YoutubeCloneBackend.Services.RegisterServices
         {
             services.AddSingleton<IConsumeMailEvent, ConsumeMailEvent>();
             services.AddSingleton<ISetting, Setting>();
-            services.AddSingleton<IRegisterOtps, RegisterOtps>();
+            services.AddSingleton<ISendOtp, SendOtp>();
             services.AddSingleton<IMail, Mail>();
             services.AddScoped<IPublishRegisterOtpMailEvent, PublishRegisterOtpMailEvent>();
             services.AddScoped<IGenerateRegisterOtp, GenerateRegisterOtp>();

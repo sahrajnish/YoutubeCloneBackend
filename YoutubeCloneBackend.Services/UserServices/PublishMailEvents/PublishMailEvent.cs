@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using YoutubeCloneBackend.Core.User;
 using YoutubeCloneBackend.Messaging.Services;
 
 namespace YoutubeCloneBackend.Services.UserServices.PublishMailEvents
@@ -17,12 +18,12 @@ namespace YoutubeCloneBackend.Services.UserServices.PublishMailEvents
             _rabbitProvider = rabbitProvider;
         }
 
-        public async Task SendWelcomeEmailToUser(string email)
+        public async Task SendOtpToUser(OtpEvent eventDetails)
         {
             using var channel = await _rabbitProvider.Connection.CreateChannelAsync();
 
             await channel.QueueDeclareAsync(
-                    queue: "new_users_queue",
+                    queue: "otp_events_queue",
                     durable: true,
                     exclusive: false,
                     autoDelete: false,
@@ -32,18 +33,41 @@ namespace YoutubeCloneBackend.Services.UserServices.PublishMailEvents
             var props = new BasicProperties();
             props.Persistent = true;
 
-            var messageObject = new
-            {
-                Email = email
-            };
-
-            var messageJson = JsonSerializer.Serialize(messageObject);
+            var messageJson = JsonSerializer.Serialize(eventDetails);
 
             var body = Encoding.UTF8.GetBytes(messageJson);
 
             await channel.BasicPublishAsync(
                     exchange: "",
-                    routingKey: "new_users_queue",
+                    routingKey: "otp_events_queue",
+                    mandatory: true,
+                    basicProperties: props,
+                    body: body
+                );
+        }
+
+        public async Task NotifyUser(NotificationEvent eventDetails)
+        {
+            using var channel = await _rabbitProvider.Connection.CreateChannelAsync();
+
+            await channel.QueueDeclareAsync(
+                    queue: "notification_queue",
+                    durable: true,
+                    exclusive: false,
+                    autoDelete: false,
+                    arguments: null
+                );
+
+            var props = new BasicProperties();
+            props.Persistent = true;
+
+            var messageJson = JsonSerializer.Serialize(eventDetails);
+
+            var body = Encoding.UTF8.GetBytes(messageJson);
+
+            await channel.BasicPublishAsync(
+                    exchange: "",
+                    routingKey: "notification_queue",
                     mandatory: true,
                     basicProperties: props,
                     body: body

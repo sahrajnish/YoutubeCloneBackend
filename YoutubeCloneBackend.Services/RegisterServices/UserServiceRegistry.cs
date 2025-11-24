@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using YoutubeCloneBackend.Persistence.SendOtps;
 using YoutubeCloneBackend.Persistence.Setting;
 using YoutubeCloneBackend.Persistence.User;
 using YoutubeCloneBackend.Persistence.ValidateOtps;
@@ -25,6 +26,7 @@ namespace YoutubeCloneBackend.Services.RegisterServices
             services.AddScoped<IValidateOtp, ValidateOtp>();
             services.AddScoped<IOtpValidations, OtpValidations>();
             services.AddScoped<IPublishMailEvent, PublishMailEvent>();
+            services.AddScoped<ISendOtp, SendOtp>();
         }
     }
 }

@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using YoutubeCloneBackend.Core.Mailjet;
+using YoutubeCloneBackend.Core.User;
 using YoutubeCloneBackend.Services.SmsEmailService.MailingService.Mails;
 using static System.Net.WebRequestMethods;
 
@@ -21,17 +22,31 @@ namespace YoutubeCloneBackend.Services.SmsEmailService.MailingService.Mails
             _options = options.Value;
         }
 
-        public async Task<bool> SendRegisterOtp(string email, string otp)
+        public async Task<bool> SendOtpEmail(OtpPurpose purpose, string email, string otp)
         {
             var client = new MailjetClient(_options.ApiKey, _options.ApiSecret);
 
+            string subject = purpose switch
+            {
+                OtpPurpose.Register => "Your Registration OTP Code",
+                OtpPurpose.ResetPassword => "Your Password Reset OTP",
+                _ => "Your OTP Code"
+            };
+
+            string description = purpose switch
+            {
+                OtpPurpose.Register => "Use this OTP to complete your registration.",
+                OtpPurpose.ResetPassword => "Use this OTP to reset your password.",
+                _ => "Use this OTP for verification."
+            };
+
             var htmlbody = $@"
-                <div style='font-family:Arial;padding:20px'>
-                    <h2>Your OTP Code is: </h2>
-                    <h1 style='color:#007bff;'>{otp}</h1>
-                    <p>It will expire in 10 minutes.</p>
-                </div>
-            ";
+                    <div style='font-family:Arial;padding:20px'>
+                        <h2>{subject}</h2>
+                        <h1 style='color:#007bff;'>{otp}</h1>
+                        <p>{description}</p>
+                        <p>This OTP expires in <strong>10 minutes</strong>.</p>
+                    </div>";
 
             var request = new MailjetRequest
             {
@@ -53,7 +68,7 @@ namespace YoutubeCloneBackend.Services.SmsEmailService.MailingService.Mails
                             {"Email", email }
                         }
                     } },
-                    {"Subject", "Your OTP Code" },
+                    {"Subject", subject },
                     {"HTMLPart", htmlbody }
                 }
             });
@@ -63,29 +78,49 @@ namespace YoutubeCloneBackend.Services.SmsEmailService.MailingService.Mails
             return response.IsSuccessStatusCode;
         }
 
-        public async Task<bool> SendWelcomeEmail(string email)
+        public async Task<bool> SendNotificationEmail(NotificationPurpose purpose, string email)
         {
             var client = new MailjetClient(_options.ApiKey, _options.ApiSecret);
 
+            string subject = purpose switch
+            {
+                NotificationPurpose.WelcomeUser => "Welcome to Matter of News!",
+                NotificationPurpose.PasswordCreated => "Your Password Has Been Created",
+                NotificationPurpose.PasswordReset => "Your Password Has Been Reset Successfully",
+                NotificationPurpose.PasswordChanged => "Your Password Was Changed",
+                _ => "Account Notification"
+            };
+
+            string description = purpose switch
+            {
+                NotificationPurpose.WelcomeUser => "Your email has been verified successfully. Welcome aboard!",
+                NotificationPurpose.PasswordCreated => "Your new password has been successfully created.",
+                NotificationPurpose.PasswordReset => "Your password has been reset successfully.",
+                NotificationPurpose.PasswordChanged => "Your password was recently changed.",
+                _ => "Here is an update regarding your account."
+            };
+
             var htmlBody = $@"
-                <div style='font-family:Arial;padding:20px;line-height:1.6'>
-                    <h2 style='color:#007bff;'>Welcome to Matter of News!</h2>
+                    <div style='font-family:Arial;padding:20px;line-height:1.6;color:#333;'>
+                        <h2 style='color:#007bff;'>{subject}</h2>
 
-                    <p>Hi there,</p>
+                        <p>Hi there,</p>
 
-                    <p>
-                        Your email has been successfully verified. We're excited to have you onboard!
-                        You now have full access to your Matter of News account.
-                    </p>
+                        <p>{description}</p>
 
-                    <p>
-                        Stay tuned for the latest curated news and personalized updates.
-                    </p>
+                        {(purpose == NotificationPurpose.WelcomeUser
+                            ? "<p>We're excited to have you join the Matter of News community. Stay tuned for curated updates and personalized content.</p>"
+                            : "<p>If you did not make this request, please secure your account immediately.</p>"
+                        )}
 
-                    <p style='margin-top:25px;'>Enjoy exploring,</p>
-                    <p><strong>The Matter of News Team</strong></p>
-                </div>
-            ";
+                        <p style='margin-top:25px;'>Regards,</p>
+                        <p><strong>The Matter of News Team</strong></p>
+
+                        <hr style='margin-top:30px;border:0;border-top:1px solid #ddd;'/>
+                        <p style='font-size:12px;color:#777;'>
+                            This is an automated message from Matter of News.
+                        </p>
+                    </div>";
 
             var request = new MailjetRequest
             {
@@ -107,7 +142,7 @@ namespace YoutubeCloneBackend.Services.SmsEmailService.MailingService.Mails
                             {"Email", email }
                         }
                     } },
-                    {"Subject", "Welcome to Matter of News Family!" },
+                    {"Subject", subject },
                     {"HTMLPart", htmlBody }
                 }
             });

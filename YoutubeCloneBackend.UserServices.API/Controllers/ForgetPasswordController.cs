@@ -6,19 +6,19 @@ using YoutubeCloneBackend.Services.UserServices.User;
 namespace YoutubeCloneBackend.UserServices.API.Controllers
 {
     [ApiController]
-    [Route("/api/User/[controller]")]
-    public class RegisterController : Controller
+    [Route("api/User/[controller]")]
+    public class ForgetPasswordController : Controller
     {
         private readonly IUserService _userService;
         private readonly IOtpValidations _OtpValidations;
-        public RegisterController(IUserService userService, IOtpValidations otpValidations)
+        public ForgetPasswordController(IUserService userService, IOtpValidations otpValidations)
         {
             _userService = userService;
             _OtpValidations = otpValidations;
         }
 
         [HttpPost]
-        public async Task<IActionResult> Register([FromBody] UserDTO request)
+        public async Task<IActionResult> ForgetPassword([FromBody] OtpDTOModel request)
         {
             if (!ModelState.IsValid)
             {
@@ -30,21 +30,9 @@ namespace YoutubeCloneBackend.UserServices.API.Controllers
                 });
             }
 
-            // Insert User to Temp Table and generate otp
-            var otpResult = await _userService.InsertUserToTempTableService(request.Email);
-            if(otpResult == null)
-            {
-                return StatusCode(500, new
-                {
-                    Status = 500,
-                    Message = "OTP service is unavailable"
-                });
-            }
+            var result = await _userService.SendResetOtpService(request.Email);
 
-            return Ok(new
-            {
-                data = otpResult
-            });
+            return Ok(result);
         }
 
         [HttpPost("VerifyOtp")]
@@ -60,7 +48,7 @@ namespace YoutubeCloneBackend.UserServices.API.Controllers
                 });
             }
 
-            var result = await _OtpValidations.VerifyOtpService(OtpPurpose.Register, request.Email, request.Otp);
+            var result = await _OtpValidations.VerifyOtpService(OtpPurpose.ResetPassword, request.Email, request.Otp);
             if (result == null)
             {
                 return StatusCode(500, new
