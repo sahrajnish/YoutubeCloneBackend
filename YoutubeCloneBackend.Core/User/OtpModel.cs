@@ -10,8 +10,6 @@ namespace YoutubeCloneBackend.Core.User
     public class VerifyOtpDTOModel
     {
         [Required]
-        public string Purpose { get; set; }
-        [Required]
         public string Email { get; set; }
         [Required]
         public string Otp {  get; set; }
@@ -23,16 +21,7 @@ namespace YoutubeCloneBackend.Core.User
         public string Email { get; set; }
     }
 
-    public class VerifyRegisterOtpResponseModel
-    {
-        public string Message { get; set; }
-        public bool IsVerified { get; set; }
-        public int? RemainingOtpAttempt { get; set; }
-        public DateTime? OtpExpiresAt { get; set; }
-        public DateTime? ReattemptAfter { get; set; }
-    }
-
-    public class SendResetOtpModel
+    public class SentOtpModel
     {
         public bool IsSuccess {  get; set; }
         public string Message { get; set; }
@@ -53,5 +42,11 @@ namespace YoutubeCloneBackend.Core.User
     public class NewUserEvent
     {
         public string Email { get; set; }
+    }
+
+    public enum ResetPurpose
+    {
+        ResetPassword,
+        Unlock
     }
 }

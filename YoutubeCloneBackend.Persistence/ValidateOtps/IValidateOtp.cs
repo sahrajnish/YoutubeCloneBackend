@@ -9,6 +9,8 @@ namespace YoutubeCloneBackend.Persistence.ValidateOtps
 {
     public interface IValidateOtp
     {
-        Task<VerifyRegisterOtpResponseModel?> VerifyRegisterationOtp(string email, string otp);
+        Task<OtpValidationModel?> VerifyRegisterationOtp(string email, string otp);
+
+        Task<OtpValidationModel?> VerifyResetPasswordOtp(string purpose, string email, string otp);
     }
 }

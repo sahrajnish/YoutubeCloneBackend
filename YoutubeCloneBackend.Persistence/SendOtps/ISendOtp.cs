@@ -10,7 +10,7 @@ namespace YoutubeCloneBackend.Persistence.SendOtps
 {
     public interface ISendOtp
     {
-        Task<RegisterOtpResponseModel?> InsertRegistrationOtpAsync(string email, string otp);
-        Task<SendResetOtpModel?> InsertResetOtpAsync(string purpose, string email,  string otp);
+        Task<SentOtpModel?> InsertRegistrationOtpAsync(string email, string otp);
+        Task<SentOtpModel?> InsertResetOtpAsync(string purpose, string email,  string otp);
     }
 }

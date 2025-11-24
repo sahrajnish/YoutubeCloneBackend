@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using YoutubeCloneBackend.Core.User;
+using YoutubeCloneBackend.Services.UserServices.OtpValidation;
 using YoutubeCloneBackend.Services.UserServices.User;
 
 namespace YoutubeCloneBackend.UserServices.API.Controllers
@@ -9,26 +10,28 @@ namespace YoutubeCloneBackend.UserServices.API.Controllers
     public class RegisterController : Controller
     {
         private readonly IUserService _userService;
-        public RegisterController(IUserService userService)
+        private readonly IOtpValidations _OtpValidations;
+        public RegisterController(IUserService userService, IOtpValidations otpValidations)
         {
             _userService = userService;
+            _OtpValidations = otpValidations;
         }
 
         [HttpPost]
-        public async Task<IActionResult> Register(string email)
+        public async Task<IActionResult> Register([FromBody] UserDTO request)
         {
-            if (string.IsNullOrEmpty(email))
+            if (!ModelState.IsValid)
             {
                 return BadRequest(new
                 {
                     Status = 400,
-                    Message = "Email is required"
+                    Message = "Invalid Input",
+                    Errors = ModelState
                 });
             }
 
             // Insert User to Temp Table and generate otp
-            var otpResult = await _userService.InsertUserToTempTableService(email);
-
+            var otpResult = await _userService.InsertUserToTempTableService(request.Email);
             if(otpResult == null)
             {
                 return StatusCode(500, new
@@ -38,35 +41,38 @@ namespace YoutubeCloneBackend.UserServices.API.Controllers
                 });
             }
 
-            // Check for Cooldown period
-            if(otpResult.ReattemptAfter.HasValue)
+            return Ok(new
             {
-                return StatusCode(429, new
+                data = otpResult
+            });
+        }
+
+        [HttpPost("VerifyOtp")]
+        public async Task<IActionResult> VerifyOtp([FromBody] VerifyOtpDTOModel request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new
                 {
-                    Status = 429,
-                    Message = $"Too many attempts. Retry at {otpResult.ReattemptAfter}",
-                    ReattemptAt = otpResult.ReattemptAfter,
-                    RemainingAttempt = otpResult.RemainingAttempts
+                    Status = 400,
+                    Message = "Invalid Input",
+                    Errors = ModelState
                 });
             }
 
-            // Check if OTP was created successfully or not.
-            if(otpResult.OtpExpiresAt == null)
+            var result = await _OtpValidations.VerifyOtpService(OtpPurpose.Register, request.Email, request.Otp);
+            if (result == null)
             {
                 return StatusCode(500, new
                 {
                     Status = 500,
-                    Message = "Failed to generate OTP. Please try again later."
+                    Message = "OTP validation failed. Please try again."
                 });
             }
 
             return Ok(new
             {
-                Status = 200,
-                Message = "OTP Sent",
-                OtpExpireyTime = otpResult.OtpExpiresAt,
-                ReattemptAt = otpResult.ReattemptAfter,
-                RemainingAttempt = otpResult.RemainingAttempts
+                data = result
             });
         }
     }

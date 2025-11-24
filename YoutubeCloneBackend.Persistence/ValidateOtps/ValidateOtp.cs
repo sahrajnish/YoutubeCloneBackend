@@ -1,4 +1,5 @@
 using Dapper;
+using Microsoft.VisualBasic;
 using Npgsql;
 using System;
 using System.Collections.Generic;
@@ -18,7 +19,7 @@ namespace YoutubeCloneBackend.Persistence.ValidateOtps
             _connectionString = setting.ConnectionString;
         }
 
-        public async Task<VerifyRegisterOtpResponseModel?> VerifyRegisterationOtp(string email, string otp)
+        public async Task<OtpValidationModel?> VerifyRegisterationOtp(string email, string otp)
         {
             using (var connection = new NpgsqlConnection(_connectionString))
             {
@@ -27,10 +28,10 @@ namespace YoutubeCloneBackend.Persistence.ValidateOtps
                 var cmdToValidateRegisterOtp = @"
                     SELECT 
                         message AS ""Message"",
-                        is_verified AS ""IsVerified"",
-                        remaining_otp_attempt AS ""RemainingOtpAttempt"",
+                        is_verified AS ""IsSuccess"",
+                        remaining_otp_attempt AS ""RemainingOtpAttempts"",
                         otp_expiry_time AS ""OtpExpiresAt"",
-                        reattempt_after AS ""ReattemptAfter""
+                        reattempt_after AS ""OtpReattemptAt""
                     FROM auth.fn_register_otp_validation(@p_email, @p_otp)";
 
                 var parameters = new
@@ -40,7 +41,7 @@ namespace YoutubeCloneBackend.Persistence.ValidateOtps
                 };
 
                 // QuerySingleAsync will return only one row of data.
-                var result = await connection.QuerySingleAsync<VerifyRegisterOtpResponseModel>(cmdToValidateRegisterOtp, parameters);
+                var result = await connection.QuerySingleAsync<OtpValidationModel>(cmdToValidateRegisterOtp, parameters);
                 if(result != null)
                 {
                     if(result.OtpExpiresAt.HasValue)
@@ -48,9 +49,49 @@ namespace YoutubeCloneBackend.Persistence.ValidateOtps
                         result.OtpExpiresAt = result.OtpExpiresAt.Value.ToLocalTime();
                     }
 
-                    if(result.ReattemptAfter.HasValue)
+                    if(result.OtpReattemptAt.HasValue)
                     {
-                        result.ReattemptAfter = result.ReattemptAfter.Value.ToLocalTime();
+                        result.OtpReattemptAt = result.OtpReattemptAt.Value.ToLocalTime();
+                    }
+                }
+
+                return result;
+            }
+        }
+
+        public async Task<OtpValidationModel?> VerifyResetPasswordOtp(string purpose, string email, string otp)
+        {
+            using (var connection = new NpgsqlConnection(_connectionString))
+            {
+                await connection.OpenAsync();
+
+                var cmdToValidateResetOtp = @"
+                    SELECT 
+                        is_success AS ""IsSuccess"",
+                        message AS ""Message"",
+                        otp_expiry_at AS ""OtpExpiresAt"",
+                        remaining_otp_attempts AS ""RemainingOtpAttempts"",
+                        reattempt_otp_at AS ""OtpReattemptAt""
+                    FROM auth.fn_reset_otp_validation(@p_purpose, @p_email, @p_otp)";
+
+                var parameter = new
+                {
+                    p_purpose = purpose,
+                    p_email = email,
+                    p_otp = otp
+                };
+
+                var result = await connection.QuerySingleAsync<OtpValidationModel>(cmdToValidateResetOtp, parameter);
+                if(result != null )
+                {
+                    if(result.OtpExpiresAt.HasValue)
+                    {
+                        result.OtpExpiresAt = result.OtpExpiresAt.Value.ToLocalTime();
+                    }
+
+                    if(result.OtpReattemptAt.HasValue)
+                    {
+                        result.OtpReattemptAt = result.OtpReattemptAt.Value.ToLocalTime();
                     }
                 }
 

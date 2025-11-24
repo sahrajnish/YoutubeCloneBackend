@@ -19,7 +19,7 @@ namespace YoutubeCloneBackend.Persistence.SendOtps
             _connectionString = setting.ConnectionString;
         }
 
-        public async Task<RegisterOtpResponseModel?> InsertRegistrationOtpAsync(string email, string otp)
+        public async Task<SentOtpModel?> InsertRegistrationOtpAsync(string email, string otp)
         {
             using (var connection = new NpgsqlConnection(_connectionString))
             {
@@ -27,9 +27,11 @@ namespace YoutubeCloneBackend.Persistence.SendOtps
 
                 var cmdToInsertOtp = @"
                     SELECT
-                        otp_expires_at AS ""OtpExpiresAt"",
-                        remaining_attempts AS ""RemainingAttempts"",
-                        reattempt_after AS ""ReattemptAfter""
+                        is_success AS ""IsSuccess"",
+                        message AS ""Message"",
+                        remaining_attempts AS ""RemainingResendAttempts"",
+                        otp_expiry_at AS ""OtpExpiresAt"",
+                        reattempt_resend_at AS ""ResendReattemptAt""
                     FROM auth.fn_add_otp_to_temp_users(@p_email, @p_otp)";         
                 
                 var parameter = new
@@ -39,7 +41,7 @@ namespace YoutubeCloneBackend.Persistence.SendOtps
                 };
 
                 // Update the Postgres database with new otp and also update the necessary fields.
-                var result = await connection.QueryFirstOrDefaultAsync<RegisterOtpResponseModel>(cmdToInsertOtp, parameter);
+                var result = await connection.QueryFirstOrDefaultAsync<SentOtpModel>(cmdToInsertOtp, parameter);
                 if(result != null)
                 {
                     if(result.OtpExpiresAt.HasValue)
@@ -48,17 +50,17 @@ namespace YoutubeCloneBackend.Persistence.SendOtps
                         result.OtpExpiresAt = result.OtpExpiresAt.Value.ToLocalTime();
                     }
                     
-                    if(result.ReattemptAfter.HasValue)
+                    if(result.ResendReattemptAt.HasValue)
                     {
                         // Convert the Reattempt time to Local time instead of GMT.
-                        result.ReattemptAfter = result.ReattemptAfter.Value.ToLocalTime();
+                        result.ResendReattemptAt = result.ResendReattemptAt.Value.ToLocalTime();
                     }
                 }
                 return result;
             }
         }
 
-        public async Task<SendResetOtpModel?> InsertResetOtpAsync(string purpose, string email, string otp)
+        public async Task<SentOtpModel?> InsertResetOtpAsync(string purpose, string email, string otp)
         {
             using (var connection = new NpgsqlConnection(_connectionString))
             {
@@ -80,7 +82,7 @@ namespace YoutubeCloneBackend.Persistence.SendOtps
                     p_otp = otp
                 };
 
-                var result = await connection.QueryFirstOrDefaultAsync<SendResetOtpModel>(cmdToInsertResetOtp, parameter);
+                var result = await connection.QueryFirstOrDefaultAsync<SentOtpModel>(cmdToInsertResetOtp, parameter);
 
                 if( result != null )
                 {

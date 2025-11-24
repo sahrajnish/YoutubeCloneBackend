@@ -30,7 +30,7 @@ namespace YoutubeCloneBackend.Services.UserServices.User
             _publishEvent = publishEvent;
         }
 
-        public async Task<RegisterOtpResponseModel> InsertUserToTempTableService(string email)
+        public async Task<SentOtpModel> InsertUserToTempTableService(string email)
         {
             if (string.IsNullOrEmpty(email))
             {
@@ -115,7 +115,7 @@ namespace YoutubeCloneBackend.Services.UserServices.User
             return result;
         }
 
-        public async Task<SendResetOtpModel?> SendResetOtpService(string email)
+        public async Task<SentOtpModel?> SendResetOtpService(string email)
         {
             if (string.IsNullOrWhiteSpace(email))
             {

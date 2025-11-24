@@ -8,6 +8,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using YoutubeCloneBackend.Core.RegisterOtp;
+using YoutubeCloneBackend.Core.User;
 
 namespace YoutubeCloneBackend.Services.UserServices.UserToSmsEmail
 {
@@ -19,7 +20,7 @@ namespace YoutubeCloneBackend.Services.UserServices.UserToSmsEmail
             _httpClient = factory.CreateClient("SmsEmailService");
         }
 
-        public async Task<RegisterOtpResponseModel?> SendOtpAsync(string email)
+        public async Task<SentOtpModel?> SendOtpAsync(string email)
         {
             if(string.IsNullOrEmpty(email))
             {
@@ -38,7 +39,7 @@ namespace YoutubeCloneBackend.Services.UserServices.UserToSmsEmail
             }
 
             // Read the response received from SmsEmailService which is in JSON and convert it to RegisterOtpResponseModel which is required by User Service.
-            return await response.Content.ReadFromJsonAsync<RegisterOtpResponseModel>(
+            return await response.Content.ReadFromJsonAsync<SentOtpModel>(
                 new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
         }
     }
