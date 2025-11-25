@@ -86,7 +86,6 @@ auth.fn_reset_otp_validation(purpose, email, otp)
 is_used = TRUE
 password_reset_allowed_till = NOW() + 15 minutes
 ```
-5. Publish success notification event.
 
 <img width="5114" height="1676" alt="VerifyOTP" src="https://github.com/user-attachments/assets/8a5210fa-e3d4-4331-9f52-4ad62f140d4b" />
 
