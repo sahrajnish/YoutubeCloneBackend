@@ -2,22 +2,19 @@
 
 The **Forgot Password Pipeline** handles the complete password recovery flow in a secure, event-driven, rate-limited, and OTP-based manner.
 
-**Contents**
-1. [Request Reset OTP – `/api/User/ForgetPassword`](#-1-apiuserforgetpassword--request-reset-otp)
-2. [Verify OTP – `/api/User/ForgetPassword/VerifyOtp`](#-2-apiuserforgetpasswordverifyotp--verify-otp)
-3. [Create New Password – `/api/User/ForgetPassword/CreatePassword`](#-3-apiuserforgetpasswordcreatepassword--create-new-password)
-4. [Database Structure](#️-database-structure)
-5. [Event-Driven Notifications](#-event-driven-notifications)
-6. [Security Features](#-security-features)
-
-
 This document explains the flow in **3 clear stages**:
 
 1. **Request Password Reset (Send OTP)**
 2. **Verify Reset OTP**
 3. **Create New Password**
 
-Each stage uses PostgreSQL functions, RabbitMQ events, throttling logic, and notification emails.
+# 📚 **Contents**
+1. [Request Reset OTP – `/api/User/ForgetPassword`](#-1-apiuserforgetpassword--request-reset-otp)
+2. [Verify OTP – `/api/User/ForgetPassword/VerifyOtp`](#-2-apiuserforgetpasswordverifyotp--verify-otp)
+3. [Create New Password – `/api/User/ForgetPassword/CreatePassword`](#-3-apiuserforgetpasswordcreatepassword--create-new-password)
+4. [Database Structure](#️-database-structure)
+5. [Event-Driven Notifications](#-event-driven-notifications)
+6. [Security Features](#-security-features)
 
 # 🟦 1. /api/User/ForgetPassword — Request Reset OTP
 
