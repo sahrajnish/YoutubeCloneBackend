@@ -4,6 +4,7 @@ Welcome! This folder contains all docs for the User Service.
 
 ## 📘 Documentation
 
+- **Register Pipeline** --> [Click here](RegisterPipeline.md)
 - **Forgot Password Pipeline** --> [Click here](ForgetPasswordPipeline.md)
 
 # Proposed User Service Design
