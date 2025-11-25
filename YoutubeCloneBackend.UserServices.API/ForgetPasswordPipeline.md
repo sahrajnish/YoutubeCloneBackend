@@ -3,9 +3,9 @@
 The **Forgot Password Pipeline** handles the complete password recovery flow in a secure, event-driven, rate-limited, and OTP-based manner.
 
 **Contents**
-1. [Request Reset OTP – `/api/User/ForgetPassword`](#-apiuserforgetpassword--request-reset-otp)
-2. [Verify Reset OTP – `/api/User/ForgetPassword/VerifyOtp`](#apiuserforgetpasswordverifyotp--verify-reset-otp)
-3. [Create New Password – `/api/User/ForgetPassword/CreatePassword`](#apiuserforgetpasswordcreatepassword--create-new-password)
+1. [Request Reset OTP – `/api/User/ForgetPassword`](#-1-apiuserforgetpassword--request-reset-otp)
+2. [Verify Reset OTP – `/api/User/ForgetPassword/VerifyOtp`](#-2-apiuserforgetpasswordverifyotp--verify-reset-otp)
+3. [Create New Password – `/api/User/ForgetPassword/CreatePassword`](#-3-apiuserforgetpasswordcreatepassword--create-new-password)
 4. [Database Structure](#️-database-structure)
 5. [Event-Driven Notifications](#-event-driven-notifications)
 6. [Security Features](#-security-features)
