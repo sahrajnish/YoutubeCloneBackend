@@ -13,6 +13,7 @@ using YoutubeCloneBackend.Persistence.SendOtps;
 using YoutubeCloneBackend.Persistence.User;
 using YoutubeCloneBackend.Services.UserServices.PublishMailEvents;
 using YoutubeCloneBackend.Services.UserServices.UserToSmsEmail;
+using static System.Net.WebRequestMethods;
 
 namespace YoutubeCloneBackend.Services.UserServices.User
 {
@@ -42,23 +43,21 @@ namespace YoutubeCloneBackend.Services.UserServices.User
                 throw new ArgumentException("Enter a valid email address");
             }
 
-            // Check if user already exists in User Table.
-            var userInUserTable = await _user.GetUser(email);
-            if (userInUserTable != null)
-            {
-                throw new ArgumentException("User already exist. Please login to continue.");
-            }
-
             // If User does not exist in user table then insert user to temp table
             var userInTempTable = await _user.InsertUserToTempTable(email);
-            if(userInTempTable == null)
+            if (userInTempTable == null)
             {
-                throw new Exception("Something went wrong while creating temp user.");
+                throw new ArgumentException("Something went wrong while registering user.");
+            }
+
+            if(userInTempTable != null && !userInTempTable.IsSuccess)
+            {
+                throw new ArgumentException(userInTempTable.Message);
             }
 
             // Call SmsEmilService API to generate OTP and send it to user's email.
             var otpData = await _smsEmailClient.SendOtpAsync(email);
-            if(otpData == null)
+            if (otpData == null)
             {
                 throw new Exception("Failed to generate OTP. Please try again later.");
             }

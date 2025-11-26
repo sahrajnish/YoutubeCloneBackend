@@ -42,31 +42,18 @@ namespace YoutubeCloneBackend.Persistence.User
             }
         }
 
-        public async Task<GetUserResponse?> GetUser(string email)
+        public async Task<InsertUserToTempTableResponse?> InsertUserToTempTable(string email)
         {
             using (var connection = new NpgsqlConnection(_connectionString))
             {
                 await connection.OpenAsync();
 
-                const string cmdCheckUser = "SELECT * FROM user_srvc.fn_get_user_from_users_table(@p_email)";
-
-                var parameter = new
-                {
-                    p_email = email,
-                };
-
-                var result = await connection.QueryFirstOrDefaultAsync<GetUserResponse>(cmdCheckUser, parameter);
-                return result;
-            }
-        }
-
-        public async Task<InsertUserToTempTableResponse> InsertUserToTempTable(string email)
-        {
-            using (var connection = new NpgsqlConnection(_connectionString))
-            {
-                await connection.OpenAsync();
-
-                const string cmdInsertUserToTempTable = "SELECT * FROM auth.fn_insert_user_to_temp_users_table(@p_email)";
+                const string cmdInsertUserToTempTable = @"
+                    SELECT 
+                        is_success AS ""IsSuccess"",
+                        message AS ""Message"",
+                        user_id AS ""Id""
+                    FROM auth.fn_insert_user_to_temp_users_table(@p_email)";
 
                 var parameter = new
                 {
