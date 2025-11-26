@@ -42,7 +42,7 @@ auth.fn_send_reset_otp('resetpassword', email, otp)
 5. Event published to RabbitMQ.
 6. Email consumer sends OTP mail.
 
-<img width="3777" height="1172" alt="ForgetPassword" src="https://github.com/user-attachments/assets/72119f64-b2c3-4afc-9bbf-70e2c4e1f826" />
+<img width="3777" height="1229" alt="ForgetPassword" src="https://github.com/user-attachments/assets/16cd1538-aa58-4357-81d4-f3bd7d8d11de" />
 
 ### **Possible Responses**
 - User does not exists.
@@ -84,7 +84,7 @@ is_used = TRUE
 password_reset_allowed_till = NOW() + 15 minutes
 ```
 
-<img width="5114" height="1676" alt="VerifyOTP" src="https://github.com/user-attachments/assets/8a5210fa-e3d4-4331-9f52-4ad62f140d4b" />
+<img width="5114" height="1676" alt="VerifyOTP" src="https://github.com/user-attachments/assets/eb4ce4f8-df9b-4629-a29a-35ee1bc7f73e" />
 
 ### **Possible Responses**
 - User does not exist.
@@ -133,7 +133,7 @@ user_srvc.fn_reset_password(purpose, email, new_password_hash)
 - OTP row deleted
 - Notification event sent
 
-<img width="5489" height="1495" alt="CreatePassword" src="https://github.com/user-attachments/assets/4b683533-c511-4778-a1be-87ae63ce5682" />
+<img width="5489" height="1495" alt="CreatePassword" src="https://github.com/user-attachments/assets/470ef703-88b2-42d9-b338-19a6798fc31a" />
 
 ### **Possible Responses**
 - Password updated successfully
