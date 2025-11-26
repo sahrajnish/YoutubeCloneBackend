@@ -9,6 +9,7 @@ A learning-focused backend for a YouTube-clone project implementing microservice
 - [Core Services](#core-services)
 - [Supporting Layers](#supporting-layers)
 - [Technology Stack](#technology-stack)
+- [Documentations](#documentations)
 
 ## Project Overview
 
@@ -20,7 +21,7 @@ This repository contains the backend codebase for a YouTube-clone application, d
 ## Core Services
 
 - **APIGateway:** Central entry-point for routing API requests to microservices.
-- **UserServices API:** Handles user management — registration.
+- **UserServices API:** Handles user management.
 
 ## Supporting Layers
 
@@ -39,3 +40,6 @@ This repository contains the backend codebase for a YouTube-clone application, d
 | ORM/Data Access      | Npgsql, Dapper                           |
 | Message Broker       | RabbitMQ                                 |
 | Email Provider       | Mailjet                                  |
+
+## Documentations
+- **UserServices API** ---> [Click here](YoutubeCloneBackend.UserServices.API/Readme.md)
