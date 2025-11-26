@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using YoutubeCloneBackend.Core.User;
-using YoutubeCloneBackend.Services.UserServices.OtpValidation;
 using YoutubeCloneBackend.Services.UserServices.User;
 
 namespace YoutubeCloneBackend.UserServices.API.Controllers
@@ -10,11 +9,9 @@ namespace YoutubeCloneBackend.UserServices.API.Controllers
     public class ForgetPasswordController : Controller
     {
         private readonly IUserService _userService;
-        private readonly IOtpValidations _OtpValidations;
-        public ForgetPasswordController(IUserService userService, IOtpValidations otpValidations)
+        public ForgetPasswordController(IUserService userService)
         {
             _userService = userService;
-            _OtpValidations = otpValidations;
         }
 
         [HttpPost]
@@ -48,7 +45,7 @@ namespace YoutubeCloneBackend.UserServices.API.Controllers
                 });
             }
 
-            var result = await _OtpValidations.VerifyOtpService(OtpPurpose.ResetPassword, request.Email, request.Otp);
+            var result = await _userService.VerifyOtpService(OtpPurpose.ResetPassword, request.Email, request.Otp);
             if (result == null)
             {
                 return StatusCode(500, new

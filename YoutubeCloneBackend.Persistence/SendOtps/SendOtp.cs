@@ -59,45 +59,5 @@ namespace YoutubeCloneBackend.Persistence.SendOtps
                 return result;
             }
         }
-
-        public async Task<SentOtpModel?> InsertResetOtpAsync(string purpose, string email, string otp)
-        {
-            using (var connection = new NpgsqlConnection(_connectionString))
-            {
-                await connection.OpenAsync();
-
-                var cmdToInsertResetOtp = @"
-                    SELECT
-                        is_success AS ""IsSuccess"",
-                        message AS ""Message"",
-                        otp_expiry_at AS ""OtpExpiresAt"",
-                        resend_reattempt_time AS ""ResendReattemptAt"",
-                        remaining_resend_attempts AS ""RemainingResendAttempts"" 
-                    FROM auth.fn_send_reset_otp(@p_purpose, @p_email, @p_otp)";
-
-                var parameter = new
-                {
-                    p_purpose = purpose,
-                    p_email = email,
-                    p_otp = otp
-                };
-
-                var result = await connection.QueryFirstOrDefaultAsync<SentOtpModel>(cmdToInsertResetOtp, parameter);
-
-                if( result != null )
-                {
-                    if(result.OtpExpiresAt.HasValue)
-                    {
-                        result.OtpExpiresAt = result.OtpExpiresAt.Value.ToLocalTime();
-                    }
-                    if(result.ResendReattemptAt.HasValue)
-                    {
-                        result.ResendReattemptAt = result.ResendReattemptAt.Value.ToLocalTime();
-                    }
-                }
-
-                return result;
-            }
-        }
     }
 }

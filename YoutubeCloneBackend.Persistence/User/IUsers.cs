@@ -12,5 +12,8 @@ namespace YoutubeCloneBackend.Persistence.User
         Task<InsertUserToTempTableResponse?> InsertUserToTempTable(string email);
         Task<CreatePasswordResponseModel?> CreateNewPassword(string email, string passwordHash);
         Task<CreatePasswordResponseModel?> ResetPassword(string purpose, string email, string passwordHash);
+        Task<SentOtpModel?> InsertResetOtpAsync(string purpose, string email, string otp);
+        Task<OtpValidationModel?> VerifyRegisterationOtp(string email, string otp);
+        Task<OtpValidationModel?> VerifyResetPasswordOtp(string purpose, string email, string otp);
     }
 }

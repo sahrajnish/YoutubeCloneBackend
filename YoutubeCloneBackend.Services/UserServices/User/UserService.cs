@@ -21,13 +21,11 @@ namespace YoutubeCloneBackend.Services.UserServices.User
     {
         private readonly IUsers _user;
         private readonly ISmsEmailClient _smsEmailClient;
-        private readonly ISendOtp _sendOtp;
         private readonly IPublishMailEvent _publishEvent;
-        public UserService(IUsers user, ISmsEmailClient smsEmailClient, ISendOtp sendOtp, IPublishMailEvent publishEvent)
+        public UserService(IUsers user, ISmsEmailClient smsEmailClient, IPublishMailEvent publishEvent)
         {
             _user = user;
             _smsEmailClient = smsEmailClient;
-            _sendOtp = sendOtp;
             _publishEvent = publishEvent;
         }
 
@@ -43,13 +41,14 @@ namespace YoutubeCloneBackend.Services.UserServices.User
                 throw new ArgumentException("Enter a valid email address");
             }
 
-            // If User does not exist in user table then insert user to temp table
+            // Insert user to temp table.
             var userInTempTable = await _user.InsertUserToTempTable(email);
             if (userInTempTable == null)
             {
                 throw new ArgumentException("Something went wrong while registering user.");
             }
 
+            // User already exists in user table or some check failed.
             if(userInTempTable != null && !userInTempTable.IsSuccess)
             {
                 throw new ArgumentException(userInTempTable.Message);
@@ -127,6 +126,7 @@ namespace YoutubeCloneBackend.Services.UserServices.User
                     throw new Exception("Database did not return any result.");
                 }
 
+                // Publish Event to RabbitMQ.
                 if(result != null && result.IsSuccess)
                 {
                     var eventDetails = new NotificationEvent
@@ -155,12 +155,16 @@ namespace YoutubeCloneBackend.Services.UserServices.User
                 throw new ArgumentException("Invalid Email.", nameof(email));
             }
 
+            // Generate Otp
             var otp = GenerateOtp();
 
+            // Set Purpose = "resetpassword".
             string purpose = OtpPurpose.ResetPassword.ToString().ToLower();
 
-            var result = await _sendOtp.InsertResetOtpAsync(purpose, email, otp);
+            // Insert Otp to DB.
+            var result = await _user.InsertResetOtpAsync(purpose, email, otp);
 
+            // Publish Otp Event to RabbitMQ
             if(result != null && result.IsSuccess)
             {
                 var eventDetails = new OtpEvent
@@ -173,6 +177,59 @@ namespace YoutubeCloneBackend.Services.UserServices.User
             }
 
             return result;
+        }
+
+        public async Task<OtpValidationModel?> VerifyOtpService(OtpPurpose Purpose, string Email, string Otp)
+        {
+            if (string.IsNullOrWhiteSpace(Email))
+            {
+                throw new ArgumentNullException(nameof(Email), "Email is required to Verify OTP");
+            }
+
+            if (string.IsNullOrEmpty(Otp))
+            {
+                throw new ArgumentNullException(nameof(Otp), "Please provide OTP to continue.");
+            }
+
+            // If Purpose is "Register"
+            if (Purpose == OtpPurpose.Register)
+            {
+                var result = await _user.VerifyRegisterationOtp(Email, Otp);
+                if (result == null)
+                {
+                    throw new Exception("OTP function returned no data — possible internal error.");
+                }
+
+                // Publish Event to Send Welcome Email to User
+                if (result.IsSuccess)
+                {
+                    var eventDetails = new NotificationEvent
+                    {
+                        Purpose = NotificationPurpose.WelcomeUser,
+                        Email = Email,
+                    };
+                    await _publishEvent.NotifyUser(eventDetails);
+                }
+
+                return result;
+            }
+
+            // If Purpose is "ResetPassword"
+            if (Purpose == OtpPurpose.ResetPassword)
+            {
+                string resetPurpose = ResetPurpose.ResetPassword.ToString().ToLower();
+
+                var result = await _user.VerifyResetPasswordOtp(resetPurpose, Email, Otp);
+
+                return result;
+            }
+
+            throw new Exception("Unsuported OTP Purpose.");
+        }
+
+        public Task<SentOtpModel?> ResendOtpService(string email)
+        {
+            throw new NotImplementedException();
         }
 
         private string HashPassword(string PlainTextPassword)
