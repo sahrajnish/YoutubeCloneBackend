@@ -16,10 +16,9 @@ namespace YoutubeCloneBackend.Core.User
 
     public class InsertUserToTempTableResponse
     {
-        public int Guid { get; set; }
-        public string Email { get; set; }
-        public DateTime EmailAddedAt { get; set; }
-        public DateTime EmailExpiresAt { get; set; }
+        public Guid Id { get; set; }
+        public bool IsSuccess { get; set; }
+        public string Message { get; set; }
     }
 
     public class UserDTO
